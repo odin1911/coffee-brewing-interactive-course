@@ -35,5 +35,6 @@ test-results/
 .tmp/
 retrospective.md
 .superpowers/
+.worktrees/
 records/*.json
 records/*.tmp
