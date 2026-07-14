@@ -9,6 +9,7 @@ node_modules/
 # 构建产物
 dist/
 dist-ssr/
+# exports/
 
 # 编辑器
 .vscode/*

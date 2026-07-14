@@ -21,6 +21,16 @@ npm run local
 
 本地服务会在 `records/` 为每次课程运行新建一个 JSON 文件，并在页面离开、答题、图表明细操作发生时立即更新。
 
+## 导出 PDF
+
+macOS 安装 Google Chrome 后，运行一条命令即可构建课程并导出完整打印版：
+
+```bash
+npm run export:pdf
+```
+
+文件输出到 `exports/course.pdf`。命令会自行启动并关闭临时服务。
+
 ## 页面
 
 - `/course`：教学内容、答题分支和图表钻取。
@@ -71,3 +81,4 @@ npm run build
 - `fixtures/`、`examples/`：替换课程与学习记录示例。
 - `docs/`、`DESIGN.md`：硬约束、规格、计划与视觉契约。
 - `records/`：本地运行时生成的会话文件（已被 Git 忽略）。
+- `scripts/export-pdf.mjs`：本地一键 PDF 导出脚本；`exports/`：生成的 PDF（已被 Git 忽略）。

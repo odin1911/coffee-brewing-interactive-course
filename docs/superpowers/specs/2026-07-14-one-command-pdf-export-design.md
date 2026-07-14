@@ -9,7 +9,7 @@
 ## 2. 目标
 
 - `npm run export:pdf` 自动构建项目、启动临时服务、导出 PDF 并关闭服务
-- 输出固定为 `exports/coffee-brewing-course.pdf`
+- 输出固定为与课程内容无关的 `exports/course.pdf`
 - 复用现有 `/print` 页面、`server.mjs` 和本机 Google Chrome
 - 导出失败时返回非零退出码并说明失败阶段
 - 不留下服务进程或被 Git 跟踪的导出文件
@@ -65,7 +65,7 @@ npm run build
 npm run export:pdf
 ```
 
-真实导出验收要求：命令退出码为 0，生成 `exports/coffee-brewing-course.pdf`，文件头为 `%PDF-`，且命令结束后不再监听临时端口。
+真实导出验收要求：命令退出码为 0，生成 `exports/course.pdf`，文件头为 `%PDF-`，且命令结束后不再监听临时端口。
 
 ## 8. 活文档同步
 

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "export:pdf": "node scripts/export-pdf.mjs",
     "start": "vite preview",
     "local": "npm run build && node server.mjs",
     "test": "vitest run"
