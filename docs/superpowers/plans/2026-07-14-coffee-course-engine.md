@@ -116,7 +116,7 @@ and inline quiz results. Visual direction: warm editorial; cream #F7F0E5,
 coffee brown #4A2C1A, amber #D89A4E, body text #2B211B. Use explicit text
 colors on every light container. Normal-text contrast >= 4.5:1, large text
 >= 3:1. Typography must work with system Chinese fonts. Keep layouts feasible
-with plain React and CSS. No runtime library, remote font, remote image, dark
+with plain React and CSS. No runtime library, remote font, dark
 mode, glassmorphism, or dashboard chrome.
 ```
 
@@ -484,7 +484,7 @@ Replace the empty `docs/skills/Contract.md` with:
 - Course slides contain teaching only. Export, recording status, restart, and validation live under `/tools`.
 - `/print` renders all configured branches and chart details; `/tools` never appears in the PDF.
 - Local recording writes one server-generated JSON file per course run; static deployment disables recording.
-- No runtime remote content, AI request, remote font, state library, or chart library.
+- No runtime AI request, remote font, remote non-image content, state library, or chart library; configured HTTPS images are allowed.
 - Light surfaces set explicit dark foreground colors. Normal text contrast is at least 4.5:1.
 ```
 
@@ -1647,7 +1647,7 @@ Deploy `dist/` to any static host. Static mode keeps teaching and PDF printing b
 
 ## Replace the course
 
-Replace `public/course.json` and referenced local assets. Do not edit code. `fixtures/course-alt.json` proves a different course can use the same engine.
+Replace only `public/course.json`; use configured HTTPS or base64 raster data images when new assets are needed. Do not edit code. `fixtures/course-alt.json` proves a different course can use the same engine.
 
 ## JSON contract
 

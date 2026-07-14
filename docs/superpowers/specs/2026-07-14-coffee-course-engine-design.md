@@ -6,13 +6,13 @@
 
 本项目需要在 4 小时内交付一个可在浏览器放映、由外部 JSON 驱动、具有互动能力并能导出完整 PDF 的课件引擎。示例课程是《咖啡冲煮入门》，但评审会通过替换 JSON 验证引擎能否承载完全不同的课程。
 
-内容与素材由 AI 生成或从公开网页收集，在构建前固化到仓库。运行时不请求 AI、第三方内容接口或远程素材。
+内容与素材由 AI 生成或从公开网页收集。运行时不请求 AI、第三方内容接口或远程非图片素材；`course.json` 可配置公开 HTTPS 图片。
 
 ## 2. 目标与非目标
 
 ### 目标
 
-- 只修改 `course.json` 和本地素材即可更换课程、品牌、页面顺序、图表数据与分支。
+- 只修改 `course.json` 即可更换课程、品牌、页面顺序、图表数据与分支；新图片可使用 HTTPS 或 base64 raster data URL。
 - 实现答题即时统计、图表点击钻取和答题分支三类交互。
 - 网页放映时只经过一个分支；PDF 包含两个分支和全部钻取明细。
 - 本地运行时持续保存每次学习会话，用于分析路径、有效时长和中途流失位置。
@@ -34,7 +34,7 @@
 - 答题方式：单浏览器，答题页穿插在教学流程中。
 - 答题后先展示统计，由讲师点击“继续”进入选项对应的分支。
 - PDF 通过同一套 HTML 和打印样式生成，包含完整课程、两个分支和全部图表明细。
-- 内容与素材在运行前固化到 `course.json`、`assets/` 和 `sources.json`。
+- 内容配置固化到 `course.json`，素材可使用本地文件、HTTPS 或 base64 raster data URL，来源记录在 `sources.json`。
 - 本地 `reference-design-contract` skill 只生成 `DESIGN.md` 和参考页面，不作为项目运行依赖。
 - 本地服务持续更新每次学习会话对应的独立 JSON 文件；静态部署不启用记录功能。
 - 第 8 页只显示 JSON 定义的教学总结与 CTA。PDF、记录状态、重新开始和校验结果位于独立工具页。
@@ -94,6 +94,10 @@
       "accent": "#D89A4E",
       "background": "#F7F0E5",
       "text": "#2B211B",
+      "surface": "#FFF9F0",
+      "muted": "#6B5545",
+      "line": "#D8C7B5",
+      "chartColors": ["#A95532", "#D89A4E", "#65704B"],
       "logo": "assets/logo.png"
     }
   },
@@ -107,7 +111,13 @@
     "openTools": "扩展工具",
     "recordStatus": "学习记录状态",
     "restartCourse": "重新开始课程",
-    "validationResult": "配置校验结果"
+    "validationResult": "配置校验结果",
+    "backToCourse": "返回课程",
+    "select": "选择",
+    "selected": "已选择",
+    "results": "当前结果",
+    "peopleUnit": "人",
+    "imageLoadError": "图片加载失败，无法导出"
   },
   "slides": [],
   "details": {}
@@ -116,15 +126,16 @@
 
 页面类型：
 
-- `cover`：`title`、`subtitle`、`image`、`imageAlt`。
+- 所有页面可选 `kicker`；默认按数组顺序前进，`next` 用于显式跳转。
+- `cover`：`title`，以及可选 `subtitle`、`topics`、`image`、`imageAlt`。
 - `content`：`title`、`bullets`、可选 `image` 和 `imageAlt`。
 - `chart`：`title`、`chart.kind`、`unit`、`clickable`、`series[]`。
-- `quiz`：`question`、`options[]`；每个选项包含 `id`、`text`、`goto` 和可选 `initialVotes`。
+- `quiz`：`question`、可选 `description`、`options[]`；每个选项包含 `id`、`text`、`goto` 和可选 `initialVotes`。
 - `cta`：`title`、`body` 和 `action`；`action` 包含 `label` 与本地或公开 `href`，不包含引擎工具。
 
 页面默认按数组顺序前进。需要跳转或汇合的页面使用显式 `next`。每个图表数据项通过 `detail` 引用顶层 `details`。
 
-所有可见课程文字、界面标签、图片路径、图片替代文字、品牌色、页面顺序和图表数据都来自 JSON。JSON 不允许嵌入任意 HTML 或脚本。
+所有可见课程文字、界面标签、图片地址、图片替代文字、品牌色、页面顺序、图表数据和 CTA 行为都来自 JSON。图片允许站内路径、HTTPS 或 base64 raster data URL；JSON 不允许嵌入任意 HTML 或脚本。
 
 `sources.json` 为每条课程事实和素材保存来源类型。网页来源记录标题、URL、访问日期和用途；AI 生成内容记录工具、提示词摘要、生成日期和用途。该文件只用于审计，不在运行时加载。
 

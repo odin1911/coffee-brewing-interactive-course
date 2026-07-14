@@ -9,6 +9,10 @@
       "accent": "#D89A4E",
       "background": "#F7F0E5",
       "text": "#2B211B",
+      "surface": "#FFF9F0",
+      "muted": "#6B5545",
+      "line": "#D8C7B5",
+      "chartColors": ["#A95532", "#D89A4E", "#65704B"],
       "logo": "assets/logo.svg"
     }
   },
@@ -23,42 +27,42 @@
     "openTools": "打开工具页",
     "recordStatus": "记录状态",
     "restartCourse": "重新开始",
-    "validationResult": "配置校验"
+    "validationResult": "配置校验",
+    "backToCourse": "返回课程",
+    "select": "选择",
+    "selected": "已选择",
+    "results": "当前结果",
+    "peopleUnit": "人",
+    "imageLoadError": "图片加载失败，无法导出"
   },
   "slides": [
     {
       "id": "cover",
       "type": "cover",
+      "kicker": "开始课程",
       "title": "把变量，冲成一杯可重复的风味。",
       "subtitle": "从产区风味、冲煮变量到一份自己的记录，用八页建立第一套手冲判断。",
+      "topics": ["风味", "变量", "记录"],
       "image": "assets/coffee-hero.png",
       "imageAlt": "暖光下的陶瓷手冲滤杯与咖啡壶"
     },
     {
-      "id": "taste",
+      "id": "beans",
       "type": "content",
-      "title": "先描述，再调整。",
+      "kicker": "产区风味",
+      "title": "咖啡豆三大产区与风味",
       "bullets": [
-        "香气是入口前的线索：花香、果香、坚果或可可。",
-        "酸质决定明亮感，甜感决定余韵是否圆润。",
-        "先写下感受，再改变参数，记录才有可比性。"
+        "非洲产区常见花香、柑橘与莓果调性。",
+        "中南美产区常见坚果、焦糖与巧克力调性。",
+        "亚洲产区常见草本、香料与醇厚口感。",
+        "烘焙度和处理法也会改变最终风味。"
       ],
-      "next": "steps"
+      "next": "caffeine"
     },
     {
-      "id": "steps",
-      "type": "content",
-      "title": "手冲咖啡的基本步骤。",
-      "bullets": [
-        "称豆、研磨、闷蒸：先让咖啡粉均匀吸水。",
-        "分段注水：保持稳定水位，避免冲穿粉床。",
-        "结束过滤：记录总时长、重量和第一口感受。"
-      ],
-      "next": "chart"
-    },
-    {
-      "id": "chart",
+      "id": "caffeine",
       "type": "chart",
+      "kicker": "变量观察",
       "title": "常见饮品的咖啡因含量",
       "chart": {
         "kind": "bar",
@@ -70,12 +74,26 @@
           { "label": "冷萃", "value": 200, "detail": "cold" }
         ]
       },
+      "next": "steps"
+    },
+    {
+      "id": "steps",
+      "type": "content",
+      "kicker": "冲煮步骤",
+      "title": "手冲咖啡的基本步骤。",
+      "bullets": [
+        "称豆、研磨、闷蒸：先让咖啡粉均匀吸水。",
+        "分段注水：保持稳定水位，避免冲穿粉床。",
+        "结束过滤：记录总时长、重量和第一口感受。"
+      ],
       "next": "quiz"
     },
     {
       "id": "quiz",
       "type": "quiz",
+      "kicker": "路径选择",
       "question": "你平时怎么喝咖啡？",
+      "description": "答案没有对错，它只决定下一页先讲固定配方，还是先讲变量对比。",
       "options": [
         { "id": "basic", "text": "速溶 / 不常喝", "goto": "basic", "initialVotes": 12 },
         { "id": "pro", "text": "手冲 / 意式", "goto": "pro", "initialVotes": 8 }
@@ -84,6 +102,7 @@
     {
       "id": "basic",
       "type": "content",
+      "kicker": "入门路径建议",
       "title": "从一杯稳定的配方开始。",
       "bullets": [
         "先固定 15g 咖啡粉、240g 水和中细研磨。",
@@ -95,6 +114,7 @@
     {
       "id": "pro",
       "type": "content",
+      "kicker": "进阶路径建议",
       "title": "从变量之间的关系开始。",
       "bullets": [
         "先记录粉水比、总时长和每段注水重量。",
@@ -106,6 +126,7 @@
     {
       "id": "extraction",
       "type": "chart",
+      "kicker": "变量观察",
       "title": "不同冲煮方式的萃取率",
       "chart": {
         "kind": "bar",
@@ -122,6 +143,7 @@
     {
       "id": "summary",
       "type": "cta",
+      "kicker": "总结",
       "title": "一杯稳定，来自一次清楚的改变。",
       "body": "你已经完成第一轮判断。把下一杯只改变的一个变量写下来，带着判断继续练习。",
       "action": { "label": "再冲一杯", "href": "/course" }

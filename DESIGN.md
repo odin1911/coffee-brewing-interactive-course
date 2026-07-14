@@ -23,6 +23,8 @@
 
 ### Core tokens
 
+运行时值由 `course.json` 注入；下表是当前示例课程值，不是引擎常量。`surface`、`muted`、`line` 缺失时只能从当前 JSON 核心颜色回退，图表色来自 `brand.chartColors`。
+
 | Token | Value | Usage |
 |-------|-------|-------|
 | `--canvas` | `#F7F0E5` | 课件主背景 |
@@ -31,8 +33,7 @@
 | `--muted` | `#6B5545` | 次要说明，禁止低于 16px |
 | `--primary` | `#4A2C1A` | 标题、主要按钮、选中状态 |
 | `--accent` | `#D89A4E` | 图表柱、进度和主题刻度 |
-| `--clay` | `#A95532` | 第二数据色、警示但非错误 |
-| `--olive` | `#65704B` | 第三数据色、分支提示 |
+| `--bar-color` | `brand.chartColors[]` | 每个图表项的数据色 |
 | `--line` | `#D8C7B5` | 1px 分隔线 |
 | `--focus` | `#B95F18` | 3px 键盘焦点环 |
 
@@ -72,7 +73,7 @@
 
 - 左侧标题和课程承诺占 7 列；右侧只放一个主题视觉，不堆叠信息卡。
 - 标题下方用“风味 → 变量 → 记录”三段短语说明学习路径。
-- 右缘 `brew rail` 标出 `01 / 08`，后续页面更新当前刻度。
+- 右缘 `brew rail` 显示当前页码，不硬编码课程总页数。
 
 ### Chart
 
@@ -95,9 +96,9 @@
 ## 6. Components
 
 - `Stage`：奶油底、1px `--line`、18px 外圆角；打印时去掉外框和阴影。
-- `BrewRail`：当前页为咖啡棕实心刻度，其余为细线；包含可读的“当前页 / 总页数”。
-- `PrimaryButton`：咖啡棕底、白字、12px 圆角、14×22px 内边距。
-- `SecondaryButton`：透明底、咖啡棕文字、1px 咖啡棕边框。
+- `BrewRail`：使用 JSON 主色显示当前页码。
+- `PrimaryButton`：`--primary` 底、`--surface` 字、12px 圆角、14×22px 内边距。
+- `SecondaryButton`：透明底、`--primary` 文字和边框。
 - `ChoiceCard`：浅纸面、深色文字、2px 边框；选中后使用咖啡棕底白字并显示“已选择”。
 - `BarButton`：琥珀/陶土/橄榄填充，名称和数值直接可见；键盘与鼠标行为一致。
 - `DetailPanel`：浅纸面、深色正文、左侧 3px 主题色标记；关闭按钮有文字标签。

@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import altCourse from '../fixtures/course-alt.json';
-import { findMissingAssets, validateCourse } from '../src/course';
+import { courseTheme, findMissingAssets, validateCourse } from '../src/course';
 
 describe('course replacement proof', () => {
   it('validates a non-coffee course without code changes', () => {
-    expect(validateCourse(altCourse).course.id).toBe('weather-safety-101');
+    const course = validateCourse(altCourse);
+    expect(course.course.id).toBe('weather-safety-101');
+    expect(courseTheme(course.course.brand)).toMatchObject({
+      '--primary': '#17324D', '--accent': '#D78B3C', '--canvas': '#EEF4F7', '--ink': '#17212B'
+    });
   });
 
   it('returns missing asset paths for the tools error experience', async () => {

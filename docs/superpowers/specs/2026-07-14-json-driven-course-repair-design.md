@@ -70,9 +70,9 @@
 
 - 站内绝对或相对路径。
 - `https://` 远程地址。
-- `data:image/...` 数据地址。
+- base64 raster `data:image/png|jpeg|webp|gif|avif` 数据地址。
 
-拒绝 `http://`、`javascript:`、非图片 data URL 和其他协议。远程图片使用 `referrerPolicy="no-referrer"`，不设置会导致普通跨域图片失败的 `crossOrigin`。
+拒绝 `http://`、`javascript:`、非 raster/base64 data URL 和其他协议。远程图片使用 `referrerPolicy="no-referrer"`，不设置会导致普通跨域图片失败的 `crossOrigin`。
 
 本地素材继续由工具页检查；远程素材通过图片加载结果判断。打印操作等待所有打印页图片完成 `load` 和 `decode`。任何图片失败时不调用打印，并显示失败地址。
 
