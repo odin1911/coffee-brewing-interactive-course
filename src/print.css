@@ -1,4 +1,61 @@
+.print-deck { padding: 22px; }
+
+.print-deck .print-slide {
+  width: 100%;
+  max-width: 1440px;
+  min-height: 0;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto 28px;
+  padding: 58px 76px 42px 62px;
+}
+
+.print-deck .print-slide .slide-body { min-height: 0; height: 100%; }
+.print-deck .bar:disabled { opacity: 1; cursor: default; }
+.chart-detail-page .content-slide { padding-top: 2vh; }
+.chart-detail-page .print-details { margin-top: 34px; }
+
+@media (max-width: 800px) {
+  .print-deck { padding: 10px; }
+  .print-deck .print-slide { padding: 34px 38px 28px 26px; }
+}
+
 @media print {
   @page { size: 16in 9in; margin: 0; }
   .asset-error { color: #A95532; font-weight: 700; }
+  .print-deck { padding: 0; background: var(--canvas); }
+  .print-toolbar { display: none; }
+  .print-deck .print-slide {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    aspect-ratio: auto;
+    margin: 0;
+    padding-left: max(62px, calc((100vw - 1440px) / 2 + 62px));
+    padding-right: max(76px, calc((100vw - 1440px) / 2 + 76px));
+    border: 0;
+    border-radius: 0;
+    page-break-after: always;
+    break-after: page;
+  }
+  /* Chromium evaluates responsive queries against its print viewport (often
+     800px wide). Restore the desktop slide layout after the mobile rules. */
+  .cover-grid { grid-template-columns: 1.02fr .98fr; gap: 44px; }
+  .chart-slide { grid-template-columns: minmax(0, 1fr) minmax(260px, 360px); gap: 44px; }
+  .quiz-slide { grid-template-columns: minmax(280px, 1fr) minmax(380px, 1fr); gap: 44px; }
+  .cover-grid h1,
+  .content-slide h1,
+  .chart-slide h1,
+  .quiz-slide h1 { font-size: clamp(42px, 5.3vw, 76px); }
+  .hero-image { max-height: 560px; }
+  .content-slide { padding-top: 8vh; }
+  .chart-detail-page .content-slide { padding-top: 2vh; }
+  .lesson-list { margin-top: 56px; gap: 24px; }
+  .lesson-list li { padding: 22px 24px 22px 58px; font-size: 20px; }
+  .lesson-list li::before { left: 24px; top: 29px; }
+  .chart-main { height: 70%; }
+  .bar { min-width: 70px; }
+  .bar span { font-size: inherit; }
+  .rail { right: max(18px, calc((100vw - 1440px) / 2 + 18px)); }
+  .print-deck .print-slide:last-child { page-break-after: auto; break-after: auto; }
 }

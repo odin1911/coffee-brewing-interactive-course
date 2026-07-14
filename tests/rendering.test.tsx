@@ -120,6 +120,49 @@ describe('JSON-driven presentation rendering', () => {
     expect(html).toContain('再冲一杯');
   });
 
+  it('reuses the course slide structure for every print main page', () => {
+    const html = renderToStaticMarkup(<PrintPage course={coffeeCourse} />);
+
+    expect(html.match(/data-slide-id=/g)).toHaveLength(coffeeCourse.slides.length);
+    expect(html).toContain('class="cover-grid"');
+    expect(html).not.toContain('class="print-brand"');
+    expect(html).not.toContain(coffeeCourse.ui.results);
+  });
+
+  it('adds chart detail continuation pages after their main slides', () => {
+    const html = renderToStaticMarkup(<PrintPage course={coffeeCourse} />);
+
+    expect(html.match(/print-slide/g)).toHaveLength(11);
+    expect(html.match(/chart-detail-page/g)).toHaveLength(2);
+    expect(html).toContain('03A');
+    expect(html).toContain('08A');
+    for (const detail of Object.values(coffeeCourse.details)) {
+      expect(html).toContain(detail.title);
+      for (const fact of detail.facts) expect(html).toContain(fact);
+    }
+  });
+
+  it('keeps shared slides at 16:9 and one slide per printed page', () => {
+    const css = readFileSync(new URL('../src/print.css', import.meta.url), 'utf8');
+
+    expect(css).toMatch(/\.print-slide[^}]*aspect-ratio:\s*16\s*\/\s*9/);
+    expect(css).toMatch(/@media print[\s\S]*\.print-toolbar\s*\{[^}]*display:\s*none/);
+    expect(css).toMatch(/@media print[\s\S]*\.print-slide[^}]*width:\s*100vw[^}]*height:\s*100vh/);
+    expect(css).toMatch(/@media print[\s\S]*\.cover-grid\s*\{[^}]*grid-template-columns:\s*1\.02fr\s+\.98fr/);
+    expect(css).toMatch(/@media print[\s\S]*\.hero-image\s*\{[^}]*max-height:\s*560px/);
+    expect(css).toMatch(/@media print[\s\S]*\.chart-slide\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(260px,\s*360px\)/);
+    expect(css).toMatch(/@media print[\s\S]*\.quiz-slide\s*\{[^}]*grid-template-columns:\s*minmax\(280px,\s*1fr\)\s+minmax\(380px,\s*1fr\)/);
+  });
+
+  it('uses the course canvas width for print preview and PDF content', () => {
+    const css = readFileSync(new URL('../src/print.css', import.meta.url), 'utf8');
+
+    expect(css).toMatch(/\.print-deck\s*\{[^}]*padding:\s*22px/);
+    expect(css).toMatch(/\.print-deck \.print-slide\s*\{[^}]*width:\s*100%[^}]*max-width:\s*1440px/);
+    expect(css).toMatch(/@media print[\s\S]*padding-left:\s*max\(62px,\s*calc\(\(100vw - 1440px\)\s*\/\s*2 \+ 62px\)\)/);
+    expect(css).toMatch(/@media print[\s\S]*padding-right:\s*max\(76px,\s*calc\(\(100vw - 1440px\)\s*\/\s*2 \+ 76px\)\)/);
+  });
+
   it('waits for decoded images and reports failed sources', async () => {
     let release: () => void = () => undefined;
     const decoded = new Promise<void>((resolve) => { release = resolve; });

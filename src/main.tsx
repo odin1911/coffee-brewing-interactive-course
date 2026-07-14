@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { assetUrl, courseTheme, CourseConfigError, findMissingAssets, imageReferrerPolicy, loadCourse, type ChartSlide, type CourseConfig, type QuizSlide, type Slide, type UiCopy } from './course';
 import { createCourseReducer, createInitialState, getNextSlideId, getWinningOptionId, type VoteCounts } from './session';
@@ -19,6 +19,10 @@ export async function completeCourse(
 
 export function applyCourseTitle(title: string, target: { title: string }) {
   target.title = title;
+}
+
+export function SlideCanvas({ pageNumber, headingId, className = '', slideId, children }: { pageNumber: string; headingId: string; className?: string; slideId?: string; children: ReactNode }) {
+  return <section className={`stage ${className}`.trim()} aria-labelledby={headingId} data-slide-id={slideId}><div className="rail" aria-label={pageNumber}><strong>{pageNumber}</strong></div><div className="slide-body">{children}</div></section>;
 }
 
 export function CoursePage({ course }: { course: CourseConfig }) {
@@ -64,22 +68,19 @@ export function CoursePage({ course }: { course: CourseConfig }) {
         </a>
         <div className="course-header-actions"><span className="course-label">{course.course.title}</span><a className="tools-link" href="/tools">{course.ui.openTools}</a></div>
       </header>
-      <section className="stage" aria-labelledby="slide-title">
-        <div className="rail" aria-label={pageNumber}><strong>{pageNumber}</strong></div>
-        <div className="slide-body">
-          <SlideView course={course} slide={slide} pageNumber={pageNumber} votes={state.votes[slide.id]} detailId={detailId} onVote={(optionId, delta) => dispatch({ type: 'VOTE', slideId: slide.id, optionId, delta })} onDetail={(id) => { dispatch({ type: 'OPEN_DETAIL', detailId: id }); void recorder.current?.feature('chart_detail_open'); }} onCloseDetail={() => { dispatch({ type: 'CLOSE_DETAIL' }); void recorder.current?.feature('chart_detail_close'); }} />
-          <nav className="slide-nav" aria-label={course.ui.navigation}>
-            <button type="button" onClick={goPrevious} disabled={state.visitedPath.length <= 1}>{course.ui.previous}</button>
-            <span>{pageNumber}</span>
-            {slide.type === 'cta' ? <a className="primary" href={slide.action.href} onClick={(event) => { event.preventDefault(); void completeCourse(recorder.current, slide.id, slide.action.href, (href) => window.location.assign(href)); }}>{slide.action.label}</a> : <button type="button" className="primary" onClick={goNext} disabled={!nextId}>{slide.type === 'quiz' ? course.ui.continue : course.ui.next}</button>}
-          </nav>
-        </div>
-      </section>
+      <SlideCanvas pageNumber={pageNumber} headingId="slide-title">
+        <SlideView course={course} slide={slide} pageNumber={pageNumber} votes={state.votes[slide.id]} detailId={detailId} onVote={(optionId, delta) => dispatch({ type: 'VOTE', slideId: slide.id, optionId, delta })} onDetail={(id) => { dispatch({ type: 'OPEN_DETAIL', detailId: id }); void recorder.current?.feature('chart_detail_open'); }} onCloseDetail={() => { dispatch({ type: 'CLOSE_DETAIL' }); void recorder.current?.feature('chart_detail_close'); }} />
+        <nav className="slide-nav" aria-label={course.ui.navigation}>
+          <button type="button" onClick={goPrevious} disabled={state.visitedPath.length <= 1}>{course.ui.previous}</button>
+          <span>{pageNumber}</span>
+          {slide.type === 'cta' ? <a className="primary" href={slide.action.href} onClick={(event) => { event.preventDefault(); void completeCourse(recorder.current, slide.id, slide.action.href, (href) => window.location.assign(href)); }}>{slide.action.label}</a> : <button type="button" className="primary" onClick={goNext} disabled={!nextId}>{slide.type === 'quiz' ? course.ui.continue : course.ui.next}</button>}
+        </nav>
+      </SlideCanvas>
     </main>
   );
 }
 
-export function SlideView({ course, slide, pageNumber, votes, detailId, onVote, onDetail, onCloseDetail }: {
+export function SlideView({ course, slide, pageNumber, votes, detailId, onVote, onDetail, onCloseDetail, mode = 'course', headingId = 'slide-title' }: {
   course: CourseConfig;
   slide: Slide;
   pageNumber: string;
@@ -88,26 +89,28 @@ export function SlideView({ course, slide, pageNumber, votes, detailId, onVote, 
   onVote: (optionId: string, delta: 1 | -1) => void;
   onDetail: (detailId: string) => void;
   onCloseDetail: () => void;
+  mode?: 'course' | 'print';
+  headingId?: string;
 }) {
-  if (slide.type === 'cover') return <div className="cover-grid"><div>{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.title}</h1>{slide.subtitle && <p className="lead">{slide.subtitle}</p>}{slide.topics && <div className="topic-line">{slide.topics.map((topic, index) => <span key={topic}>{index > 0 && <i />}{topic}</span>)}</div>}</div>{slide.image && <img className="hero-image" src={assetUrl(slide.image)} referrerPolicy={imageReferrerPolicy(slide.image)} alt={slide.imageAlt ?? ''} />}</div>;
-  if (slide.type === 'content') return <div className="content-slide">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.title}</h1><ul className="lesson-list">{slide.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>{slide.image && <img className="content-image" src={assetUrl(slide.image)} referrerPolicy={imageReferrerPolicy(slide.image)} alt={slide.imageAlt ?? ''} />}</div>;
-  if (slide.type === 'chart') return <ChartView slide={slide} course={course} pageNumber={pageNumber} detailId={detailId} onDetail={onDetail} onCloseDetail={onCloseDetail} />;
-  if (slide.type === 'quiz') return <QuizView slide={slide} ui={course.ui} pageNumber={pageNumber} votes={votes} onVote={onVote} />;
-  return <div className="content-slide">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.title}</h1><p className="lead">{slide.body}</p></div>;
+  if (slide.type === 'cover') return <div className="cover-grid"><div>{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id={headingId}>{slide.title}</h1>{slide.subtitle && <p className="lead">{slide.subtitle}</p>}{slide.topics && <div className="topic-line">{slide.topics.map((topic, index) => <span key={topic}>{index > 0 && <i />}{topic}</span>)}</div>}</div>{slide.image && <img className="hero-image" src={assetUrl(slide.image)} referrerPolicy={imageReferrerPolicy(slide.image)} alt={slide.imageAlt ?? ''} />}</div>;
+  if (slide.type === 'content') return <div className="content-slide">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id={headingId}>{slide.title}</h1><ul className="lesson-list">{slide.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>{slide.image && <img className="content-image" src={assetUrl(slide.image)} referrerPolicy={imageReferrerPolicy(slide.image)} alt={slide.imageAlt ?? ''} />}</div>;
+  if (slide.type === 'chart') return <ChartView slide={slide} course={course} pageNumber={pageNumber} detailId={mode === 'course' ? detailId : null} onDetail={onDetail} onCloseDetail={onCloseDetail} interactive={mode === 'course'} headingId={headingId} />;
+  if (slide.type === 'quiz') return <QuizView slide={slide} ui={course.ui} pageNumber={pageNumber} votes={votes} onVote={onVote} interactive={mode === 'course'} headingId={headingId} />;
+  return <div className="content-slide">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id={headingId}>{slide.title}</h1><p className="lead">{slide.body}</p>{mode === 'print' && <a className="print-action" href={slide.action.href}>{slide.action.label}</a>}</div>;
 }
 
-export function ChartView({ slide, course, pageNumber, detailId, onDetail, onCloseDetail }: { slide: ChartSlide; course: CourseConfig; pageNumber: string; detailId: string | null; onDetail: (id: string) => void; onCloseDetail: () => void }) {
+export function ChartView({ slide, course, pageNumber, detailId, onDetail, onCloseDetail, interactive = true, headingId = 'slide-title' }: { slide: ChartSlide; course: CourseConfig; pageNumber: string; detailId: string | null; onDetail: (id: string) => void; onCloseDetail: () => void; interactive?: boolean; headingId?: string }) {
   const max = Math.max(1, ...slide.chart.series.map((item) => item.value));
   const activeId = slide.chart.clickable ? detailId : null;
   const detail = activeId ? course.details[activeId] : undefined;
   const colors = course.course.brand.chartColors ?? [course.course.brand.primary, course.course.brand.accent, course.course.brand.text];
-  return <div className="chart-slide"><div className="chart-main">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.title}</h1><div className="bars" role="list" aria-label={`${slide.title} ${slide.chart.unit}`}>{slide.chart.series.map((item, index) => <button key={item.detail} type="button" className={item.detail === activeId ? 'bar active' : 'bar'} style={{ height: `${Math.max(25, item.value / max * 100)}%`, '--bar-color': colors[index % colors.length] } as CSSProperties} aria-label={`${course.ui.showDetail}: ${item.label}`} aria-pressed={item.detail === activeId} disabled={!slide.chart.clickable} onClick={() => onDetail(item.detail)}><strong>{item.value}{slide.chart.unit}</strong><span>{item.label}</span></button>)}</div></div>{detail && <aside className="detail-panel"><h2>{detail.title}</h2><ul>{detail.facts.map((fact) => <li key={fact}>{fact}</li>)}</ul><button type="button" onClick={onCloseDetail}>{course.ui.closeDetail}</button></aside>}</div>;
+  return <div className="chart-slide"><div className="chart-main">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id={headingId}>{slide.title}</h1><div className="bars" role="list" aria-label={`${slide.title} ${slide.chart.unit}`}>{slide.chart.series.map((item, index) => <button key={item.detail} type="button" className={item.detail === activeId ? 'bar active' : 'bar'} style={{ height: `${Math.max(25, item.value / max * 100)}%`, '--bar-color': colors[index % colors.length] } as CSSProperties} aria-label={`${course.ui.showDetail}: ${item.label}`} aria-pressed={item.detail === activeId} disabled={!interactive || !slide.chart.clickable} onClick={() => onDetail(item.detail)}><strong>{item.value}{slide.chart.unit}</strong><span>{item.label}</span></button>)}</div></div>{detail && <aside className="detail-panel"><h2>{detail.title}</h2><ul>{detail.facts.map((fact) => <li key={fact}>{fact}</li>)}</ul><button type="button" onClick={onCloseDetail}>{course.ui.closeDetail}</button></aside>}</div>;
 }
 
-export function QuizView({ slide, ui, pageNumber, votes = {}, onVote }: { slide: QuizSlide; ui: UiCopy; pageNumber: string; votes?: VoteCounts; onVote: (optionId: string, delta: 1 | -1) => void }) {
+export function QuizView({ slide, ui, pageNumber, votes = {}, onVote, interactive = true, headingId = 'slide-title' }: { slide: QuizSlide; ui: UiCopy; pageNumber: string; votes?: VoteCounts; onVote: (optionId: string, delta: 1 | -1) => void; interactive?: boolean; headingId?: string }) {
   const total = slide.options.reduce((sum, option) => sum + (votes[option.id] ?? 0), 0);
   const winner = getWinningOptionId(slide, votes);
-  return <div className="quiz-slide"><div className="quiz-prompt">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.question}</h1>{slide.description && <p className="lead">{slide.description}</p>}</div><div className="quiz-panel"><div className="choices">{slide.options.map((option) => { const count = votes[option.id] ?? 0; const leading = winner === option.id; return <div key={option.id} style={{ display: 'grid', gridTemplateColumns: '1fr 64px', gap: 8 }}><button type="button" aria-pressed={leading} className={leading ? 'choice selected' : 'choice'} onClick={() => onVote(option.id, 1)}><span>{option.text}</span><small>{leading ? ui.selected : ui.select}</small></button><button type="button" className="vote-remove" style={{ minHeight: 48, border: '1px solid var(--primary)', borderRadius: 10, background: 'var(--surface)', color: 'var(--primary)', fontWeight: 800, cursor: count ? 'pointer' : 'not-allowed', opacity: count ? 1 : .35 }} aria-label={`−1 ${option.text}`} disabled={count === 0} onClick={() => onVote(option.id, -1)}>−1</button></div>; })}</div><div className="results" aria-live="polite"><h2>{ui.results} · {total} {ui.peopleUnit}</h2>{slide.options.map((option) => { const count = votes[option.id] ?? 0; const percent = total ? Math.round(count / total * 100) : 0; return <div className="result" style={{ gridTemplateColumns: '120px 1fr 100px' }} key={option.id}><span>{option.text}</span><div className="track"><i style={{ width: `${percent}%` }} /></div><strong>{count} {ui.peopleUnit} · {percent}%</strong></div>; })}</div></div></div>;
+  return <div className="quiz-slide"><div className="quiz-prompt">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id={headingId}>{slide.question}</h1>{slide.description && <p className="lead">{slide.description}</p>}</div><div className="quiz-panel"><div className="choices">{slide.options.map((option) => { const count = votes[option.id] ?? 0; const leading = winner === option.id; return interactive ? <div key={option.id} style={{ display: 'grid', gridTemplateColumns: '1fr 64px', gap: 8 }}><button type="button" aria-pressed={leading} className={leading ? 'choice selected' : 'choice'} onClick={() => onVote(option.id, 1)}><span>{option.text}</span><small>{leading ? ui.selected : ui.select}</small></button><button type="button" className="vote-remove" style={{ minHeight: 48, border: '1px solid var(--primary)', borderRadius: 10, background: 'var(--surface)', color: 'var(--primary)', fontWeight: 800, cursor: count ? 'pointer' : 'not-allowed', opacity: count ? 1 : .35 }} aria-label={`−1 ${option.text}`} disabled={count === 0} onClick={() => onVote(option.id, -1)}>−1</button></div> : <div className="choice" key={option.id}><span>{option.text}</span></div>; })}</div>{interactive && <div className="results" aria-live="polite"><h2>{ui.results} · {total} {ui.peopleUnit}</h2>{slide.options.map((option) => { const count = votes[option.id] ?? 0; const percent = total ? Math.round(count / total * 100) : 0; return <div className="result" style={{ gridTemplateColumns: '120px 1fr 100px' }} key={option.id}><span>{option.text}</span><div className="track"><i style={{ width: `${percent}%` }} /></div><strong>{count} {ui.peopleUnit} · {percent}%</strong></div>; })}</div>}</div></div>;
 }
 
 export async function waitForImages(images: HTMLImageElement[]): Promise<void> {
@@ -140,8 +143,18 @@ export function ToolsPage({ course }: { course: CourseConfig }) {
   return <main className="utility-shell" style={courseTheme(course.course.brand) as CSSProperties}><a className="utility-back" href="/course">← {course.ui.backToCourse}</a><div className="utility-card"><p className="eyebrow">{course.course.title}</p><h1>{course.ui.openTools}</h1><div className="utility-actions"><a href="/print">{course.ui.exportPdf}</a><a href="/course">{course.ui.restartCourse}</a></div><dl><div><dt>{course.ui.validationResult}</dt><dd>已加载 {course.slides.length} 个页面定义</dd></div><div><dt>素材</dt><dd>{missingAssets.length ? <span className="asset-error">缺少：{missingAssets.join('、')}</span> : '本地素材检查通过'}</dd></div><div><dt>{course.ui.recordStatus}</dt><dd>本地运行时由服务端增量保存；纯静态部署自动关闭</dd></div></dl></div></main>;
 }
 
+function chartDetailGroups(slide: ChartSlide) {
+  const groups: Array<ChartSlide['chart']['series']> = [];
+  for (let index = 0; index < slide.chart.series.length; index += 3) groups.push(slide.chart.series.slice(index, index + 3));
+  return groups;
+}
+
+export function ChartDetailPage({ course, slide, pageNumber, items }: { course: CourseConfig; slide: ChartSlide; pageNumber: string; items: ChartSlide['chart']['series'] }) {
+  const headingId = `slide-title-${slide.id}-${pageNumber}`;
+  return <SlideCanvas className="print-slide chart-detail-page" pageNumber={pageNumber} headingId={headingId}><div className="content-slide"><p className="eyebrow">{course.ui.showDetail} · {pageNumber}</p><h1 id={headingId}>{slide.title}</h1><div className="print-details">{items.map((item) => { const detail = course.details[item.detail]; return <section key={item.detail}><h2>{detail.title}</h2><ul>{detail.facts.map((fact) => <li key={fact}>{fact}</li>)}</ul></section>; })}</div></div></SlideCanvas>;
+}
+
 export function PrintPage({ course }: { course: CourseConfig }) {
-  const colors = course.course.brand.chartColors ?? [course.course.brand.primary, course.course.brand.accent, course.course.brand.text];
   const [imageError, setImageError] = useState('');
   const print = async () => {
     setImageError('');
@@ -152,7 +165,7 @@ export function PrintPage({ course }: { course: CourseConfig }) {
       setImageError(`${course.ui.imageLoadError}: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
-  return <main className="print-deck" style={courseTheme(course.course.brand) as CSSProperties}><header className="print-toolbar"><a href="/course">{course.ui.backToCourse}</a>{imageError && <p className="print-error" role="alert">{imageError}</p>}<button type="button" onClick={print}>{course.ui.exportPdf}</button></header>{course.slides.map((slide, index) => <article className="print-slide" key={slide.id}><p className="eyebrow">{String(index + 1).padStart(2, '0')} / {course.slides.length}{slide.kicker ? ` · ${slide.kicker}` : ''}</p>{slide.type === 'cover' && <div className="print-brand"><img src={assetUrl(course.course.brand.logo)} referrerPolicy={imageReferrerPolicy(course.course.brand.logo)} alt="" /><strong>{course.course.title}</strong><span>{course.course.presenter}</span></div>}<h1>{slide.title ?? ('question' in slide ? slide.question : slide.id)}</h1>{slide.type === 'cover' && <><p className="print-lead">{slide.subtitle}</p>{slide.topics && <p className="print-topics">{slide.topics.join(' · ')}</p>}{slide.image && <img src={assetUrl(slide.image)} referrerPolicy={imageReferrerPolicy(slide.image)} alt={slide.imageAlt ?? ''} />}</>}{slide.type === 'content' && <><ul>{slide.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>{slide.image && <img src={assetUrl(slide.image)} referrerPolicy={imageReferrerPolicy(slide.image)} alt={slide.imageAlt ?? ''} />}</>}{slide.type === 'quiz' && <><p className="print-lead">{slide.description}</p><div className="print-options">{slide.options.map((option) => <p key={option.id}><strong>{option.text}</strong><span>→ {option.goto}</span></p>)}</div></>}{slide.type === 'chart' && <div className="print-chart"><div className="print-bars">{slide.chart.series.map((item, itemIndex) => { const max = Math.max(1, ...slide.chart.series.map((entry) => entry.value)); return <div key={item.detail} style={{ height: `${Math.max(25, item.value / max * 100)}%`, '--bar-color': colors[itemIndex % colors.length] } as CSSProperties}><strong>{item.value}{slide.chart.unit}</strong><span>{item.label}</span></div>; })}</div><div className="print-details">{slide.chart.series.map((item) => <section key={item.detail}><h2>{course.details[item.detail]?.title}</h2><ul>{course.details[item.detail]?.facts.map((fact) => <li key={fact}>{fact}</li>)}</ul></section>)}</div></div>}{slide.type === 'cta' && <><p className="print-lead">{slide.body}</p><a className="print-action" href={slide.action.href}>{slide.action.label}</a></>}</article>)}</main>;
+  return <main className="print-deck" aria-label={`${course.course.title} · ${course.course.presenter}`} style={courseTheme(course.course.brand) as CSSProperties}><header className="print-toolbar"><a href="/course">{course.ui.backToCourse}</a>{imageError && <p className="print-error" role="alert">{imageError}</p>}<button type="button" onClick={print}>{course.ui.exportPdf}</button></header>{course.slides.flatMap((slide, index) => { const pageNumber = String(index + 1).padStart(2, '0'); const headingId = `slide-title-${slide.id}`; const pages: ReactNode[] = [<SlideCanvas key={slide.id} className="print-slide" slideId={slide.id} pageNumber={pageNumber} headingId={headingId}><SlideView course={course} slide={slide} pageNumber={pageNumber} headingId={headingId} mode="print" detailId={null} onVote={() => undefined} onDetail={() => undefined} onCloseDetail={() => undefined} /></SlideCanvas>]; if (slide.type === 'chart') chartDetailGroups(slide).forEach((items, groupIndex) => { const suffix = String.fromCharCode(65 + groupIndex); pages.push(<ChartDetailPage key={`${slide.id}-${suffix}`} course={course} slide={slide} pageNumber={`${pageNumber}${suffix}`} items={items} />); }); return pages; })}</main>;
 }
 
 if (typeof document !== 'undefined') createRoot(document.getElementById('root')!).render(<App />);
