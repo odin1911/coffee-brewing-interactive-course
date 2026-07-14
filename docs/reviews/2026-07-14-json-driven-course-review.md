@@ -1,6 +1,6 @@
 # JSON 驱动课程 Review
 
-日期：2026-07-14  
+日期：2026-07-14
 依据：考题附录 A、附录 B，以及项目“只修改 `public/course.json` 即可完全换课”的约束。
 
 ## 修复前问题
@@ -42,7 +42,7 @@
 
 ## GREEN evidence
 
-- `npm test`：7 个测试文件、33 项测试全部通过。
+- `npm test`：7 个测试文件、37 项测试全部通过。
 - `npm run build`：TypeScript 检查通过，Vite 生产构建成功。
 - `git diff --check`：退出码 0，无空白错误。
 - 定向 RED/GREEN 已分别观察：附录 A 页序、JSON 渲染、主题变量、图片等待和地址安全边界均先失败后通过。
@@ -60,6 +60,18 @@
 | C5 | 复验发现附录 B 原有的 4 个工具页 `ui` 文案仍未消费，工具页也未应用 JSON 主题 | 课程页显示 JSON 工具入口；工具页使用 `openTools`、`recordStatus`、`restartCourse`、`validationResult` 并继承课程品牌主题 | `renders every Appendix B tools label from JSON with the course theme` |
 
 上述五项均观察到定向测试先失败、修复后通过；最终再次执行全套测试、生产构建和空白检查。
+
+## 最终独立代码 Review
+
+第二个全新 subagent 对 `7571837..c3b5769` 做最终只读审查：无 Critical，发现 4 项 Important、1 项 Minor。全部问题均已通过定向失败测试复现并修复。
+
+| ID | Review 发现（修复前） | 修复后效果 | 回归证明 |
+|---|---|---|---|
+| F1 | `\\host/path` 会被误判为本地地址，浏览器可将其解析为远程请求 | 图片和 CTA 的站内地址统一拒绝反斜杠 | 不安全图片/CTA 地址测试加入反斜杠样例 |
+| F2 | `detail in details` 会把 `toString` 等原型属性当成真实明细 | 明细引用只接受 `details` 的自有属性 | `rejects chart detail ids inherited from the object prototype` |
+| F3 | 空图表、负数图表值、字符串/负数/小数票数可通过校验 | 图表序列非空、值有限且非负；票数必须是非负整数；零值图表使用稳定基线 | 图表和初始票数边界测试 |
+| F4 | 页眉次要文字及焦点环在动态品牌色下可能低于对比度要求 | 校验 JSON 中正文/标题/次要文字与浅色表面的 6 组组合均不低于 `4.5:1`；深色表面改用 `--canvas`，浅色焦点改用 `brand.text` | 低对比度配置拒绝测试与 CSS 组合断言 |
+| F5 | 提交范围内 Review 文档日期行有尾随空格 | 移除尾随空格，并以基线到 HEAD 的范围执行 `git diff --check` | `git diff 7571837..HEAD --check` |
 
 ## 字段“展示”的判定边界
 

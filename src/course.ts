@@ -39,9 +39,21 @@ export class CourseConfigError extends Error {
 const record = (value: unknown): value is Record<string, any> => typeof value === 'object' && value !== null && !Array.isArray(value);
 const text = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0;
 const color = (value: unknown): value is string => typeof value === 'string' && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value);
+const colorChannels = (value: string) => {
+  const hex = value.slice(1);
+  const expanded = hex.length === 3 ? [...hex].map((part) => part + part).join('') : hex;
+  return [0, 2, 4].map((offset) => Number.parseInt(expanded.slice(offset, offset + 2), 16) / 255);
+};
+const luminance = (value: string) => colorChannels(value)
+  .map((channel) => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)
+  .reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
+const contrastRatio = (first: string, second: string) => {
+  const [lighter, darker] = [luminance(first), luminance(second)].sort((a, b) => b - a);
+  return (lighter + 0.05) / (darker + 0.05);
+};
 const dataImage = (value: string) => /^data:image\/(?:png|jpeg|webp|gif|avif);base64,[a-z0-9+/=\s]+$/i.test(value);
 const cleanAddress = (value: string) => value === value.trim();
-const localAddress = (value: string) => cleanAddress(value) && !value.startsWith('//') && !/^[a-z][a-z\d+.-]*:/i.test(value);
+const localAddress = (value: string) => cleanAddress(value) && !value.includes('\\') && !value.startsWith('//') && !/^[a-z][a-z\d+.-]*:/i.test(value);
 const httpsAddress = (value: string) => {
   if (!cleanAddress(value)) return false;
   try { const url = new URL(value); return url.protocol === 'https:' && Boolean(url.hostname); } catch { return false; }
@@ -54,7 +66,7 @@ export const imageReferrerPolicy = (path: string) => httpsAddress(path) ? 'no-re
 export const courseTheme = (brand: Brand): ThemeStyle => ({
   '--primary': brand.primary,
   '--accent': brand.accent,
-  '--focus': brand.accent,
+  '--focus': brand.text,
   '--canvas': brand.background,
   '--ink': brand.text,
   '--surface': brand.surface ?? brand.background,
@@ -76,6 +88,21 @@ export function validateCourse(input: unknown): CourseConfig {
       if (!imageAddress(course.brand.logo)) errors.push('course.brand.logo must be a local, HTTPS, or raster data image');
       for (const key of ['surface', 'muted', 'line']) if (course.brand[key] !== undefined && !color(course.brand[key])) errors.push(`course.brand.${key} must be a hex color`);
       if (course.brand.chartColors !== undefined && (!Array.isArray(course.brand.chartColors) || course.brand.chartColors.length === 0 || !course.brand.chartColors.every(color))) errors.push('course.brand.chartColors must be non-empty hex colors');
+      if (color(course.brand.primary) && color(course.brand.background) && color(course.brand.text)
+        && (course.brand.surface === undefined || color(course.brand.surface))
+        && (course.brand.muted === undefined || color(course.brand.muted))) {
+        const surface = course.brand.surface ?? course.brand.background;
+        const muted = course.brand.muted ?? course.brand.text;
+        const pairs = [
+          ['text/background', course.brand.text, course.brand.background],
+          ['text/surface', course.brand.text, surface],
+          ['primary/background', course.brand.primary, course.brand.background],
+          ['primary/surface', course.brand.primary, surface],
+          ['muted/background', muted, course.brand.background],
+          ['muted/surface', muted, surface]
+        ] as const;
+        for (const [name, foreground, background] of pairs) if (contrastRatio(foreground, background) < 4.5) errors.push(`course.brand contrast ${name} must be at least 4.5:1`);
+      }
     }
   }
 
@@ -101,18 +128,18 @@ export function validateCourse(input: unknown): CourseConfig {
         if (!text(raw.title) || (raw.subtitle !== undefined && !text(raw.subtitle)) || (raw.topics !== undefined && (!Array.isArray(raw.topics) || !raw.topics.every(text))) || (raw.image !== undefined && !imageAddress(raw.image)) || (raw.imageAlt !== undefined && !text(raw.imageAlt))) errors.push(`slides.${index} cover is invalid`);
       } else if (raw.type === 'content' && (!text(raw.title) || !Array.isArray(raw.bullets) || !raw.bullets.every(text) || (raw.image !== undefined && !imageAddress(raw.image)) || (raw.imageAlt !== undefined && !text(raw.imageAlt)))) errors.push(`slides.${index} content is invalid`);
       else if (raw.type === 'chart') {
-        if (!text(raw.title) || !record(raw.chart) || raw.chart.kind !== 'bar' || !text(raw.chart.unit) || typeof raw.chart.clickable !== 'boolean' || !Array.isArray(raw.chart.series)) errors.push(`slides.${index} chart is invalid`);
-        else for (const item of raw.chart.series) if (!record(item) || !text(item.label) || typeof item.value !== 'number' || !text(item.detail)) errors.push(`slides.${index} chart item is invalid`);
+        if (!text(raw.title) || !record(raw.chart) || raw.chart.kind !== 'bar' || !text(raw.chart.unit) || typeof raw.chart.clickable !== 'boolean' || !Array.isArray(raw.chart.series) || raw.chart.series.length === 0) errors.push(`slides.${index} chart is invalid`);
+        else for (const item of raw.chart.series) if (!record(item) || !text(item.label) || typeof item.value !== 'number' || !Number.isFinite(item.value) || item.value < 0 || !text(item.detail)) errors.push(`slides.${index} chart item is invalid`);
       } else if (raw.type === 'quiz') {
         if (!text(raw.question) || (raw.description !== undefined && !text(raw.description)) || !Array.isArray(raw.options) || raw.options.length < 2) errors.push(`slides.${index} quiz is invalid`);
-        else for (const option of raw.options) if (!record(option) || !text(option.id) || !text(option.text) || !text(option.goto)) errors.push(`slides.${index} quiz option is invalid`);
+        else for (const option of raw.options) if (!record(option) || !text(option.id) || !text(option.text) || !text(option.goto) || (option.initialVotes !== undefined && (!Number.isInteger(option.initialVotes) || option.initialVotes < 0))) errors.push(`slides.${index} quiz option is invalid`);
       } else if (raw.type === 'cta' && (!text(raw.title) || !text(raw.body) || !record(raw.action) || !text(raw.action.label) || !actionAddress(raw.action.href))) errors.push(`slides.${index} action.href is invalid`);
       else if (!['cover', 'content', 'chart', 'quiz', 'cta'].includes(raw.type)) errors.push(`slides.${index} unknown type: ${raw.type}`);
     }
     for (const raw of slides) if (record(raw)) {
       if (text(raw.next) && !ids.has(raw.next)) errors.push(`unknown next: ${raw.next}`);
       if (raw.type === 'quiz' && Array.isArray(raw.options)) for (const option of raw.options) if (record(option) && text(option.goto) && !ids.has(option.goto)) errors.push(`unknown goto: ${option.goto}`);
-      if (raw.type === 'chart' && record(raw.chart) && Array.isArray(raw.chart.series)) for (const item of raw.chart.series) if (record(item) && text(item.detail) && (!record(details) || !(item.detail in details))) errors.push(`unknown detail: ${item.detail}`);
+      if (raw.type === 'chart' && record(raw.chart) && Array.isArray(raw.chart.series)) for (const item of raw.chart.series) if (record(item) && text(item.detail) && (!record(details) || !Object.hasOwn(details, item.detail))) errors.push(`unknown detail: ${item.detail}`);
     }
   }
 

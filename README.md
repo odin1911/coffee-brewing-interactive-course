@@ -31,22 +31,22 @@ npm run local
 
 只修改 `public/course.json`、不修改任何代码，即可更换课程文字、品牌、图片、页序、图表、分支和 CTA。页面类型支持 `cover`、`content`、`chart`、`quiz`、`cta`。
 
-图片地址支持站内路径、HTTPS 远程图片和 base64 raster `data:image/...`。若要求只交付一个 JSON，使用 HTTPS 或 data 图片；使用新的站内路径时仍需把对应文件放入 `public/`。远程图片服务器必须允许公开访问；页面使用 `no-referrer` 请求，导出时若任何图片失败会阻止打印并显示失败地址。
+图片地址支持站内路径、HTTPS 远程图片和 base64 raster `data:image/...`。若要求只交付一个 JSON，使用 HTTPS 或 data 图片；使用新的站内路径时仍需把对应文件放入 `public/`。远程图片服务器必须允许公开访问；页面使用 `no-referrer` 请求，导出时若任何图片失败会阻止打印并显示失败地址。地址中的反斜杠会被拒绝，避免浏览器把伪装的站内路径解释成远程地址。
 
 ### JSON 字段
 
 - `course`：`id`、`version`、`title`、`presenter` 和 `brand`。
-- `brand`：必填 `primary`、`accent`、`background`、`text`、`logo`；可选 `surface`、`muted`、`line`、`chartColors`。颜色使用 `#RGB` 或 `#RRGGBB`。
+- `brand`：必填 `primary`、`accent`、`background`、`text`、`logo`；可选 `surface`、`muted`、`line`、`chartColors`。颜色使用 `#RGB` 或 `#RRGGBB`，正文/标题/次要文字与浅色表面的组合必须达到 `4.5:1`。
 - `ui`：导航、选择、统计、图表明细、打印和图片错误等可见标签。
 - `slides[]`：通用字段为 `id`、`type`、可选 `kicker` 和 `next`；数组顺序决定默认页序。
 - `cover`：`title`，以及可选 `subtitle`、`topics`、`image`、`imageAlt`。
 - `content`：`title`、`bullets`，以及可选 `image`、`imageAlt`。
-- `chart`：`title` 和 `chart.kind/unit/clickable/series[]`；每项包含 `label`、`value`、`detail`。
-- `quiz`：`question`、可选 `description` 和 `options[]`；每项包含 `id`、`text`、`goto`、可选 `initialVotes`。
+- `chart`：`title` 和 `chart.kind/unit/clickable/series[]`；`series` 不得为空，每项包含 `label`、非负有限数值 `value`、指向自有 `details` 项的 `detail`。
+- `quiz`：`question`、可选 `description` 和 `options[]`；每项包含 `id`、`text`、`goto`、可选的非负整数 `initialVotes`。
 - `cta`：`title`、`body`、`action.label`、`action.href`。
 - `details`：图表明细表；每项包含 `title` 和 `facts[]`。
 
-CTA 允许站内/相对地址、页内锚点、HTTPS、`mailto:` 和 `tel:`。配置加载时会拒绝 HTTP 图片、HTTP CTA、脚本协议、无效颜色和悬空的页面/明细引用。
+CTA 允许站内/相对地址、页内锚点、HTTPS、`mailto:` 和 `tel:`。配置加载时会拒绝 HTTP 图片、HTTP CTA、脚本协议、反斜杠地址、低对比度品牌色和悬空的页面/明细引用。
 
 替换后运行 `npm test` 和 `npm run build`。`fixtures/course-alt.json` 是非咖啡课程的零代码替换证明；工具页只检查站内素材，远程图片在实际加载和打印前检查。
 

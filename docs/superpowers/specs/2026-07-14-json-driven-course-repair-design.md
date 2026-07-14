@@ -43,7 +43,7 @@
 
 ### 4.2 界面文案
 
-优先复用现有 `ui` 字段：`previous`、`next`、`continue`、`showDetail`、`closeDetail` 和 `exportPdf`。确有可见用途但现有字段无法表达时，才增加简短字段：`backToCourse`、`select`、`selected`、`results`、`peopleUnit` 和 `imageLoadError`。
+优先复用现有 `ui` 字段：`previous`、`next`、`continue`、`showDetail`、`closeDetail`、`exportPdf`、`openTools`、`recordStatus`、`restartCourse` 和 `validationResult`。确有可见用途但现有字段无法表达时，才增加简短字段：`backToCourse`、`select`、`selected`、`results`、`peopleUnit` 和 `imageLoadError`。
 
 不再展示的装饰文字直接删除，不为其增加配置。页码只显示数字，避免引入模板语法。
 
@@ -72,7 +72,7 @@
 - `https://` 远程地址。
 - base64 raster `data:image/png|jpeg|webp|gif|avif` 数据地址。
 
-拒绝 `http://`、`javascript:`、非 raster/base64 data URL 和其他协议。远程图片使用 `referrerPolicy="no-referrer"`，不设置会导致普通跨域图片失败的 `crossOrigin`。
+拒绝 `http://`、`javascript:`、反斜杠路径、非 raster/base64 data URL 和其他协议。远程图片使用 `referrerPolicy="no-referrer"`，不设置会导致普通跨域图片失败的 `crossOrigin`。
 
 本地素材继续由工具页检查；远程素材通过图片加载结果判断。打印操作等待所有打印页图片完成 `load` 和 `decode`。任何图片失败时不调用打印，并显示失败地址。
 
@@ -90,8 +90,10 @@
 课程校验继续拒绝重复页面 ID、无效 `next`、`goto` 和 `detail`。本批次增加：
 
 - 品牌色和 `chartColors` 只接受 `#RGB` 或 `#RRGGBB`，避免浏览器与测试环境产生不同解释。
+- `text`、`primary`、`muted` 与 `background` / `surface` 的普通文字组合必须达到 `4.5:1`；浅色焦点使用 `text`，深色表面焦点使用 `background`。
 - 图片 URL 必须符合允许的三类地址。
 - 新增可见文案字段存在时必须是非空字符串；数组项不得为空。
+- 图表序列不得为空，数值必须有限且非负；明细引用只接受 `details` 自有属性；初始票数必须是非负整数。
 - CTA `href` 只允许站内路径、`https://`、`mailto:` 和 `tel:`，拒绝脚本协议。
 
 配置错误继续阻止放映并给出字段路径，不静默使用旧课程默认值。

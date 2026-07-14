@@ -47,7 +47,7 @@ describe('validateCourse', () => {
   });
 
   it('rejects unsafe image addresses', () => {
-    for (const logo of ['http://img.example/a.jpg', 'javascript:alert(1)', ' javascript:alert(1)', 'https://', 'data:text/html,x']) {
+    for (const logo of ['http://img.example/a.jpg', 'javascript:alert(1)', ' javascript:alert(1)', 'https://', 'data:text/html,x', '\\\\evil.example/a.png']) {
       const input = structuredClone(valid);
       input.course.brand.logo = logo;
       expect(() => validateCourse(input)).toThrow(/course\.brand\.logo/);
@@ -55,7 +55,7 @@ describe('validateCourse', () => {
   });
 
   it('rejects unsafe CTA addresses', () => {
-    for (const href of ['javascript:alert(1)', ' javascript:alert(1)', 'http://example.com', 'https://']) {
+    for (const href of ['javascript:alert(1)', ' javascript:alert(1)', 'http://example.com', 'https://', '\\\\evil.example/course']) {
       const input = structuredClone(valid);
       input.slides.at(-1).action.href = href;
       expect(() => validateCourse(input)).toThrow(/action\.href/);
@@ -71,6 +71,14 @@ describe('validateCourse', () => {
     copy.slides[0].kicker = '';
     copy.slides[0].topics = ['Valid', ''];
     expect(() => validateCourse(copy)).toThrow(/slides\.0/);
+  });
+
+  it('rejects brand colors that violate normal-text contrast', () => {
+    const input = structuredClone(valid);
+    input.course.brand.primary = '#FFFFFF';
+    input.course.brand.background = '#FFFFFF';
+
+    expect(() => validateCourse(input)).toThrow(/course\.brand contrast/);
   });
 
   it('rejects duplicate slide ids', () => {
@@ -92,6 +100,35 @@ describe('validateCourse', () => {
       chart: { kind: 'bar', unit: 'mg', clickable: true, series: [{ label: 'A', value: 1, detail: 'missing' }] }
     });
     expect(() => validateCourse(input)).toThrow(/unknown detail: missing/);
+  });
+
+  it('rejects chart detail ids inherited from the object prototype', () => {
+    const input = structuredClone(valid);
+    input.slides.splice(1, 0, {
+      id: 'chart', type: 'chart', title: 'Chart',
+      chart: { kind: 'bar', unit: 'mg', clickable: true, series: [{ label: 'A', value: 1, detail: 'toString' }] }
+    });
+
+    expect(() => validateCourse(input)).toThrow(/unknown detail: toString/);
+  });
+
+  it('rejects empty charts and invalid chart values', () => {
+    const empty = structuredClone(valid);
+    empty.slides.splice(1, 0, { id: 'chart', type: 'chart', title: 'Chart', chart: { kind: 'bar', unit: 'mg', clickable: true, series: [] } });
+    expect(() => validateCourse(empty)).toThrow(/slides\.1 chart is invalid/);
+
+    const negative = structuredClone(valid);
+    negative.details.value = { title: 'Value', facts: ['Fact'] };
+    negative.slides.splice(1, 0, { id: 'chart', type: 'chart', title: 'Chart', chart: { kind: 'bar', unit: 'mg', clickable: true, series: [{ label: 'A', value: -1, detail: 'value' }] } });
+    expect(() => validateCourse(negative)).toThrow(/slides\.1 chart item is invalid/);
+  });
+
+  it('rejects non-integer or negative initial votes', () => {
+    for (const initialVotes of ['3', -1, 1.5]) {
+      const input = structuredClone(valid);
+      input.slides[1].options[0].initialVotes = initialVotes;
+      expect(() => validateCourse(input)).toThrow(/slides\.1 quiz option is invalid/);
+    }
   });
 
   it('returns every validation error', () => {

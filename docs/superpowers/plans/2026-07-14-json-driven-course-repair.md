@@ -355,3 +355,14 @@ git status --short
 ```
 
 Expected: all tests and build pass; status contains no unintended files.
+
+### Final review synchronization (2026-07-14)
+
+Independent review expanded the validation boundary without changing the approved architecture:
+
+- reject backslash-based local image and CTA addresses;
+- require non-empty chart series, finite non-negative chart values, own-property detail references, and non-negative integer initial votes;
+- validate six normal-text brand-color combinations at `4.5:1` and use separate focus colors for light and dark surfaces;
+- run the final whitespace check across the complete delivery range with `git diff 7571837..HEAD --check`, not only the working tree.
+
+The focused regression tests for these findings live in `tests/course.test.ts` and `tests/rendering.test.tsx`; the final review evidence is recorded in `docs/reviews/2026-07-14-json-driven-course-review.md`.

@@ -71,7 +71,9 @@ describe('JSON-driven presentation rendering', () => {
     expect(css).toMatch(/\.bar\{[^}]*background:var\(--bar-color/);
     expect(css).toMatch(/\.print-slide\{[^}]*background:var\(--canvas\)/);
     expect(css).toMatch(/:where\(a,button\):focus-visible\{[^}]*outline:3px solid var\(--focus\)/);
-    expect(courseTheme(altCourse.course.brand)['--focus']).toBe(altCourse.course.brand.accent);
+    expect(css).toMatch(/\.course-label\{[^}]*color:var\(--canvas\)/);
+    expect(css).toMatch(/\.course-header a:focus-visible[^}]*outline-color:var\(--canvas\)/);
+    expect(courseTheme(altCourse.course.brand)['--focus']).toBe(altCourse.course.brand.text);
     expect(source).not.toContain('冲煮手记');
   });
 

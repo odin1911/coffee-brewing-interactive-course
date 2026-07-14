@@ -35,13 +35,13 @@
 | `--accent` | `#D89A4E` | 图表柱、进度和主题刻度 |
 | `--bar-color` | `brand.chartColors[]` | 每个图表项的数据色 |
 | `--line` | `#D8C7B5` | 1px 分隔线 |
-| `--focus` | `brand.accent` | 3px 键盘焦点环，随课程品牌色切换 |
+| `--focus` | `brand.text` | 浅色表面上的 3px 键盘焦点环 |
 
 ### Contrast contract
 
 - `--ink`、`--primary` 与 `--muted` 在 `--canvas` / `--surface` 上必须达到 WCAG AA 普通文本 `4.5:1`。
 - `--accent` 只与 `--ink` 组合；不得在琥珀色上放白色普通文本。
-- 主要按钮使用 `--primary` 背景和 `#FFFFFF` 前景。
+- 主要按钮使用 `--primary` 背景和 `--surface` 前景；页眉、工具栏等深色表面使用 `--canvas` 文字。
 - 图表不能只靠颜色：每根柱同时显示名称和数值，选中项再增加描边与详情面板。
 - 不响应系统深色模式；课件前景色始终由这些令牌决定。
 
@@ -111,7 +111,7 @@
 - 页面进入：整体 `opacity 0 → 1`、`translateY(8px) → 0`，180ms。
 - 图表选择：只动画 `transform` 与 `opacity`，详情 180ms 淡入；柱高不重复弹跳。
 - 答题：选项选中 140ms，结果区 180ms 出现；不使用庆祝粒子或持续动画。
-- 焦点：所有按钮和链接使用 3px `--focus` 外环与 2px 奶油色间隔。
+- 焦点：浅色表面使用 3px `--focus` 外环，深色页眉/工具栏使用 `--canvas` 外环，均保留 2px 间隔。
 - `prefers-reduced-motion: reduce` 下取消所有非必要过渡。
 - 空格/右箭头不能越过未答题页面；返回后允许修改答案。
 

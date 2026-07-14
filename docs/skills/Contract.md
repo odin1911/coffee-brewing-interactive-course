@@ -20,11 +20,11 @@
 - `/print` renders all configured branches and chart details; `/tools` never appears in the PDF.
 - Local recording writes one server-generated JSON file per course run; static deployment disables recording.
 - No runtime AI request, remote font, remote non-image content, state library, or chart library. Configured public HTTPS images are the only remote-content exception.
-- Images accept local paths, HTTPS URLs, or base64 raster data URLs. HTTP, executable protocols, and non-image data URLs are rejected.
+- Images accept local paths, HTTPS URLs, or base64 raster data URLs. HTTP, executable protocols, backslash paths, and non-image data URLs are rejected.
 - Printing waits for every configured image to load and decode. A failed image blocks printing with its address; a successfully exported PDF contains its image data and opens offline.
 - Light surfaces set explicit dark foreground colors. Normal text contrast is at least 4.5:1.
 - The sample course follows Appendix A: 9 definitions provide two 8-page branches in the order cover, regions, caffeine, steps, quiz, branch, extraction, CTA.
-- Chart data is native button/CSS UI with a top-level `details` entry for every drill-down item.
+- Chart data is native button/CSS UI. Series are non-empty with finite non-negative values; every drill-down id must be an own top-level `details` entry. Quiz initial votes are non-negative integers.
 - The `/course` route contains teaching only; `/tools` and `/print` are separate routes.
 - `public/sources.json` records the origin of every course fact and image, including remote image URLs.
 - Missing local assets are reported on `/tools` with a repairable path; they do not silently render broken images.
