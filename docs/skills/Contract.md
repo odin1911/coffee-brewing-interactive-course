@@ -23,7 +23,7 @@
 - Images accept local paths, HTTPS URLs, or base64 raster data URLs. HTTP, executable protocols, backslash paths, and non-image data URLs are rejected.
 - Printing waits for every configured image to load and decode. A failed image blocks printing with its address; a successfully exported PDF contains its image data and opens offline.
 - Light surfaces set explicit dark foreground colors. Normal text contrast is at least 4.5:1.
-- The sample course follows Appendix A: 9 definitions provide two 8-page branches in the order cover, regions, caffeine, steps, quiz, branch, extraction, CTA.
+- The preserved `fixtures/course-coffee.json` reference course follows Appendix A: 9 definitions provide two 8-page branches in the order cover, regions, caffeine, steps, quiz, branch, extraction, CTA. The active `public/course.json` may be any valid replacement course.
 - Chart data is native button/CSS UI. Series are non-empty with finite non-negative values; every drill-down id must be an own top-level `details` entry. Quiz initial votes are non-negative integers.
 - The `/course` route contains teaching only; `/tools` and `/print` are separate routes.
 - `public/sources.json` records the origin of every course fact and image, including remote image URLs.

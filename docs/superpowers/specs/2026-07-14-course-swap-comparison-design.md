@@ -9,9 +9,9 @@
 ## 文件变化
 
 - 将替换前的 `public/course.json` 原样保存为 `fixtures/course-coffee.json`。
-- 将现有 `fixtures/course-alt.json` 原样复制为新的 `public/course.json`。
+- 以现有 `fixtures/course-alt.json` 生成新的 `public/course.json`；仅移除其故意指向缺失文件的可选封面图片字段，避免活动课程出现坏图并阻止 PDF。
 - 不修改 `src/` 下任何运行时代码。
-- 将只适用于附录 A 咖啡内容、咖啡图表和打印文案的测试改为读取 `fixtures/course-coffee.json`，避免活动课程换成其他主题后产生错误失败。另以通用测试验证活动 `public/course.json` 可加载且与家庭防灾 fixture 一致。
+- 将只适用于附录 A 咖啡内容、咖啡图表和打印文案的测试改为读取 `fixtures/course-coffee.json`，避免活动课程换成其他主题后产生错误失败。另以通用测试验证活动 `public/course.json` 可加载、课程 ID 正确且不引用缺失封面图片。
 
 ## 对比范围
 

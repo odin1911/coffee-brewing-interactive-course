@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import altCourse from '../fixtures/course-alt.json';
+import activeJson from '../public/course.json';
 import { courseTheme, findMissingAssets, validateCourse } from '../src/course';
 
 describe('course replacement proof', () => {
+  it('uses the family safety course as the active runtime JSON', () => {
+    const course = validateCourse(activeJson);
+    expect(course.course.id).toBe('weather-safety-101');
+    expect(course.slides[0]).not.toHaveProperty('image');
+  });
+
   it('validates a non-coffee course without code changes', () => {
     const course = validateCourse(altCourse);
     expect(course.course.id).toBe('weather-safety-101');

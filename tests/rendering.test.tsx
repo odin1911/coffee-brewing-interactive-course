@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import altJson from '../fixtures/course-alt.json';
-import courseJson from '../public/course.json';
+import courseJson from '../fixtures/course-coffee.json';
 import { courseTheme, validateCourse } from '../src/course';
 import { applyCourseTitle, ChartView, completeCourse, CoursePage, PrintPage, SlideView, ToolsPage, waitForImages } from '../src/main';
 

@@ -1,19 +1,26 @@
 {
   "generatedAt": "2026-07-14",
-  "sourcePolicy": "课程事实与素材均由 AI 依据用户提供的考题文档生成；未运行时抓取远程内容。",
+  "sourcePolicy": "课程事实与素材均由 AI 依据用户提供的考题与换课验证要求生成；未运行时抓取远程内容。",
   "entries": [
-    { "path": "course.title|course.presenter|course.brand.*|ui.*", "source": "AI-generated from the supplied exam brief", "purpose": "课程标题、署名、品牌令牌与界面文案" },
-    { "path": "slides.cover.title|slides.cover.subtitle|slides.cover.imageAlt", "source": "AI-generated from the supplied exam brief", "purpose": "封面教学引导" },
-    { "path": "slides.beans.title|slides.beans.bullets[*]", "source": "AI-generated from the supplied exam brief", "purpose": "三大产区与风味" },
-    { "path": "slides.steps.title|slides.steps.bullets[*]", "source": "AI-generated coffee-brewing teaching copy", "purpose": "手冲基本步骤" },
-    { "path": "slides.caffeine.series[*]", "source": "AI-generated illustrative comparison data; values are teaching examples, not scientific reference data", "purpose": "咖啡因含量图表" },
-    { "path": "slides.quiz", "source": "AI-generated from the supplied exam brief", "purpose": "穿插式答题与分支选择" },
-    { "path": "slides.basic.title|slides.basic.bullets[*]", "source": "AI-generated coffee-brewing teaching copy", "purpose": "基础分支教学" },
-    { "path": "slides.pro.title|slides.pro.bullets[*]", "source": "AI-generated coffee-brewing teaching copy", "purpose": "进阶分支教学" },
-    { "path": "slides.extraction.chart.series[*]", "source": "AI-generated illustrative comparison data; values are teaching examples, not scientific reference data", "purpose": "萃取率图表" },
-    { "path": "slides.summary.title|slides.summary.body|slides.summary.action.*", "source": "AI-generated coffee-brewing teaching copy", "purpose": "课程总结教学收束" },
-    { "path": "details.*", "source": "AI-generated coffee-brewing teaching copy", "purpose": "图表钻取明细" },
-    { "path": "public/assets/coffee-hero.png", "source": "AI-generated local visual asset", "purpose": "封面主视觉" },
-    { "path": "public/assets/logo.svg", "source": "AI-generated local SVG mark", "purpose": "课程品牌标记" }
+    {
+      "path": "course.*|ui.*",
+      "source": "AI-generated family safety replacement fixture",
+      "purpose": "课程标题、署名、品牌令牌与界面文案"
+    },
+    {
+      "path": "slides.cover.*",
+      "source": "AI-generated family safety teaching copy",
+      "purpose": "家庭防灾课程封面"
+    },
+    {
+      "path": "slides.end.*",
+      "source": "AI-generated family safety teaching copy",
+      "purpose": "课程行动总结"
+    },
+    {
+      "path": "public/assets/logo.svg",
+      "source": "AI-generated local SVG mark",
+      "purpose": "课程品牌标记"
+    }
   ]
 }

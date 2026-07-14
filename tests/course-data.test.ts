@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import courseJson from '../public/course.json';
+import courseJson from '../fixtures/course-coffee.json';
 import { validateCourse } from '../src/course';
 
 describe('active course data', () => {
