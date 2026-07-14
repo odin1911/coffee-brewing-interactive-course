@@ -67,7 +67,7 @@ npm run validate:course
 npm install
 ```
 
-现场评审使用一条命令构建并启动完整课件：
+现场放映使用一条命令构建并启动完整课件：
 
 ```bash
 npm start
@@ -141,3 +141,22 @@ npm run build
 - `docs/`、`DESIGN.md`：硬约束、规格、计划与视觉契约。
 - `records/`：本地运行时生成的会话文件（已被 Git 忽略）。
 - `scripts/export-pdf.mjs`：本地一键 PDF 导出脚本；`exports/course.pdf`：纳入 Git 跟踪的正式交付 PDF。
+
+## AI 执行约束
+
+本仓库为 AI 辅助设计、开发和验证提供项目内上下文。AI 在分析或修改项目之前，应按以下顺序读取约束：
+
+1. [AGENTS.md](./AGENTS.md)：工作语言、调查方式、最小验证和禁止事项。
+2. [Contract.md](./docs/skills/Contract.md)：内容边界、JSON 契约、交互、素材、运行和交付硬约束。
+3. [DESIGN.md](./DESIGN.md)：视觉令牌、布局、组件行为和无障碍规则。
+4. [设计规格](./docs/superpowers/specs/)与[实施计划](./docs/superpowers/plans/)：已确认的需求边界、架构决策、目标文件和验证方式。
+
+功能开发遵循“约束 → 规格 → 计划 → 测试 → 实现 → 验证”的流程：
+
+| 阶段 | 产物或规则 | 使用的核心 Skill |
+|---|---|---|
+| 需求与设计 | 修改功能前先澄清边界，并在 `docs/superpowers/specs/` 形成经确认的规格 | `brainstorming`、`reference-design-contract`、`frontend-design` |
+| 实施准备 | 根据规格在 `docs/superpowers/plans/` 生成可执行计划 | `writing-plans` |
+| 开发与修复 | 先写失败测试，再做最小实现；遇到缺陷先定位根因 | `test-driven-development`、`systematic-debugging` |
+| 素材与导出 | 图片按设计约束生成，PDF 逐页检查 | `imagegen`、`pdf` |
+| 完成交付 | 重新运行 JSON 校验、测试、构建、浏览器主流程和 PDF 检查后才能声明完成 | `verification-before-completion` |
