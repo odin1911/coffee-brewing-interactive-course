@@ -28,4 +28,5 @@
 - The `/course` route contains teaching only; `/tools` and `/print` are separate routes.
 - `public/sources.json` records the origin of every course fact and image, including remote image URLs.
 - Missing local assets are reported on `/tools` with a repairable path; they do not silently render broken images.
+- `npm start` is the official one-command local delivery path: it builds the production frontend and starts `server.mjs` on port 4173 by default. `npm run local` is an alias; `npm run preview` only serves an existing Vite build.
 - `npm run export:pdf` builds, starts a temporary local server, writes the course-neutral `exports/course.pdf`, and stops the server without browser interaction. The PDF is a tracked delivery artifact.

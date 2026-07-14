@@ -230,7 +230,9 @@ Create `package.json`:
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "start": "vite preview",
+    "preview": "vite preview",
+    "start": "npm run build && node server.mjs",
+    "local": "npm start",
     "test": "vitest run"
   }
 }
