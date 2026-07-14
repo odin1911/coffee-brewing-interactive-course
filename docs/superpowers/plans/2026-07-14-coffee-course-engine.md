@@ -229,7 +229,8 @@ Create `package.json`:
   "engines": { "node": ">=24" },
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "validate:course": "vitest run tests/active-course.test.ts",
+    "build": "npm run validate:course && tsc --noEmit && vite build",
     "preview": "vite preview",
     "start": "npm run build && node server.mjs",
     "local": "npm start",

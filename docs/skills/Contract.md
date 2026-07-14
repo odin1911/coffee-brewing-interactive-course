@@ -38,6 +38,7 @@
 
 ## 运行与交付
 
+- 每次修改 `public/course.json` 后必须运行 `npm run validate:course`。该命令直接校验活动配置；`npm run build`、`npm start` 和 `npm run export:pdf` 必须自动继承此门槛。
 - 本地记录模式由服务端为每次课程运行创建一个 JSON 文件；纯静态部署自动关闭记录功能。
 - `npm start` 是正式的一键本地交付命令：先构建生产前端，再启动 `server.mjs`，默认端口为 `4173`。`npm run local` 是兼容别名；`npm run preview` 只预览已有的 Vite 构建。
 - `npm run export:pdf` 构建项目、启动临时服务、生成通用文件名 `exports/course.pdf`，并在无需浏览器交互的情况下关闭临时服务。该 PDF 是纳入版本库跟踪的正式交付物。

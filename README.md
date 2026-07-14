@@ -29,6 +29,14 @@
 
 完整配置参考：[当前课程](./public/course.json)、[咖啡课程样例](./fixtures/course-coffee.json)和[非咖啡课程样例](./fixtures/course-alt.json)。`public/sources.json` 记录课程文案和图片的来源。
 
+修改 JSON 后先运行配置校验：
+
+```bash
+npm run validate:course
+```
+
+该命令直接加载并校验当前 `public/course.json`。JSON 语法错误、必填字段缺失、非法颜色或地址、悬空的页面跳转和图表明细引用都会使命令失败。`npm run build`、`npm start` 和 `npm run export:pdf` 会自动执行同一项校验。
+
 ## JSON 驱动架构
 
 代码只实现通用课件引擎，课程专用内容全部由 `public/course.json` 提供：
@@ -115,6 +123,7 @@ npm run export:pdf
 ## 验证
 
 ```bash
+npm run validate:course
 npm test
 npm run build
 ```
