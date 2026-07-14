@@ -4,7 +4,7 @@ import { createCourseReducer, createInitialState } from '../src/session';
 
 const course = {
   course: { id: 'x', version: '1', title: 'X', presenter: 'P', brand: { primary: '#1', accent: '#2', background: '#3', text: '#4', logo: 'x' } },
-  ui: { navigation: 'nav', previous: 'p', next: 'n', continue: 'c', showDetail: 's', closeDetail: 'x', exportPdf: 'e', openTools: 't', recordStatus: 'r', restartCourse: 'z', validationResult: 'v' },
+  ui: { navigation: 'nav', previous: 'p', next: 'n', continue: 'c', showDetail: 's', closeDetail: 'x', exportPdf: 'e', openTools: 't', recordStatus: 'r', restartCourse: 'z', validationResult: 'v', backToCourse: 'b', select: 'select', selected: 'selected', results: 'results', peopleUnit: 'people', imageLoadError: 'image error' },
   details: { d1: { title: 'D1', facts: [] } },
   slides: [
     { id: 'cover', type: 'cover', title: 'Cover' },

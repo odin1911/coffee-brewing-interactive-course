@@ -288,7 +288,7 @@ Expected: all rendering tests pass.
 
 - [ ] **Step 1: Update required living documents**
 
-Document the exact JSON fields, Appendix A order, CSS theme mapping, allowed image protocols, remote-image privacy/availability limitation, print waiting behavior, and literal JSON-only replacement using HTTPS or data images. Replace the old “no runtime remote content” wording with “no runtime remote content except configured HTTPS images.”
+Document the exact JSON fields, Appendix A order, CSS theme mapping, allowed image protocols, remote-image privacy/availability limitation, print waiting behavior, and literal JSON-only replacement using HTTPS or data images. Replace the obsolete absolute remote-content prohibition with the configured HTTPS-image exception.
 
 - [ ] **Step 2: Complete the review document**
 
@@ -312,7 +312,7 @@ Run:
 
 ```bash
 rg -n "只修改.*course\.json|HTTPS|data:image|附录 A|图片.*加载" README.md docs/skills/Contract.md DESIGN.md docs/superpowers docs/reviews
-rg -n "no runtime remote content|不请求.*远程素材|运行时不请求.*远程" README.md docs/skills/Contract.md DESIGN.md docs/superpowers
+rg -n "no runtime remote content|不请求.*远程素材|运行时不请求.*远程" README.md docs/skills/Contract.md DESIGN.md docs/superpowers/specs/2026-07-14-coffee-course-engine-design.md docs/superpowers/plans/2026-07-14-coffee-course-engine.md
 ```
 
 Expected: the first command finds the new rules; the second finds no stale absolute prohibition unless explicitly qualified by the HTTPS-image exception.
@@ -355,3 +355,14 @@ git status --short
 ```
 
 Expected: all tests and build pass; status contains no unintended files.
+
+### Final review synchronization (2026-07-14)
+
+Independent review expanded the validation boundary without changing the approved architecture:
+
+- reject backslash-based local image and CTA addresses;
+- require non-empty chart series, finite non-negative chart values, own-property detail references, and non-negative integer initial votes;
+- validate six normal-text brand-color combinations at `4.5:1` and use separate focus colors for light and dark surfaces;
+- run the final whitespace check across the complete delivery range with `git diff 7571837..HEAD --check`, not only the working tree.
+
+The focused regression tests for these findings live in `tests/course.test.ts` and `tests/rendering.test.tsx`; the final review evidence is recorded in `docs/reviews/2026-07-14-json-driven-course-review.md`.
