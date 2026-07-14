@@ -1,25 +1,98 @@
 # JSON 驱动互动课件
 
-这是一个由 JSON 驱动的中文交互课程。当前活动课程已恢复为“咖啡冲煮入门”；同一份原始 JSON 也保存在 `fixtures/course-coffee.json`，作为考题附录 A 的 9 页面定义、两条 8 页分支参考样例。
+这是一个由 JSON 驱动的中文互动课件。当前示例课程为“咖啡冲煮入门”，包含课程播放、答题分支、图表明细、学习记录和 PDF 导出；只修改 `public/course.json` 即可替换为另一门课程。
 
-## 当前状态
+## JSON 配置格式
 
-阶段 0–8 已完成：课程运行时、穿插式答题、图表明细、工具页、本地增量记录、完整打印和替换课程校验均已实现。家庭防灾换课验证已完成并恢复咖啡课程，验证期间运行时代码未改动。
+`public/course.json` 是课件内容的唯一运行时来源。只修改该文件即可更换课程文字、品牌、图片、页序、图表、分支和结束页操作，不需要修改 `src/`。
 
-## 运行
+配置由四个顶层字段组成：
+
+- `course`：课程身份信息，以及 `brand` 品牌配置。
+- `ui`：导航、答题、图表明细、打印和图片错误等交互标签。
+- `slides[]`：页面定义；数组顺序决定默认页序。
+- `details`：图表点击钻取的明细数据表。
+
+字段结构如下：
+
+- `course`：必填 `id`、`version`、`title`、`presenter` 和 `brand`。
+- `brand`：必填 `primary`、`accent`、`background`、`text`、`logo`；可选 `surface`、`muted`、`line`、`chartColors`。颜色使用 `#RGB` 或 `#RRGGBB`，正文、标题和次要文字与浅色表面的对比度不得低于 `4.5:1`。
+- `slides[]`：通用字段为 `id`、`type`、可选 `kicker` 和 `next`。
+- `cover`：必填 `title`；可选 `subtitle`、`topics`、`image`、`imageAlt`。
+- `content`：必填 `title`、`bullets`；可选 `image`、`imageAlt`。
+- `chart`：必填 `title` 和 `chart.kind/unit/clickable/series[]`；每项数据包含 `label`、非负有限数值 `value`、指向 `details` 的 `detail`。
+- `quiz`：必填 `question`、`options[]`；可选 `description`；每个选项包含 `id`、`text`、`goto` 和可选的非负整数 `initialVotes`。
+- `cta`：必填 `title`、`body`、`action.label`、`action.href`。
+- `details`：每项包含 `title` 和 `facts[]`。
+
+图片支持站内路径、HTTPS 地址和 base64 raster `data:image/...`。CTA 支持站内或相对地址、页内锚点、HTTPS、`mailto:` 和 `tel:`。配置加载时会拒绝 HTTP 图片、HTTP CTA、脚本协议、反斜杠地址、低对比度品牌色和悬空的页面或明细引用。
+
+完整配置参考：[当前课程](./public/course.json)、[咖啡课程样例](./fixtures/course-coffee.json)和[非咖啡课程样例](./fixtures/course-alt.json)。`public/sources.json` 记录课程文案和图片的来源。
+
+## JSON 驱动架构
+
+代码只实现通用课件引擎，课程专用内容全部由 `public/course.json` 提供：
+
+| 硬性要求 | JSON 字段 | 实现方式 |
+|---|---|---|
+| 全部课程文字 | `course`、`ui`、`slides[]`、`details` | React 组件只读取已校验配置，不导入课程专用文案 |
+| 图表数据与明细 | `chart.series`、`details` | 通用图表组件按数据生成图形，并通过 `detail` 查找钻取内容 |
+| 页面顺序与分支 | `slides[]`、`next`、`options[].goto` | 数组顺序控制默认流程，`next` 和 `goto` 控制显式跳转 |
+| 品牌配色与图片 | `brand`、`image`、`logo` | 品牌色转换为 CSS 变量，图片地址由通用素材函数解析 |
+| 完整打印版 | 同一份完整配置 | `/course` 与 `/print` 复用同一个配置对象，不维护第二份内容 |
+
+运行链路如下：
+
+1. 浏览器从 `/course.json` 加载配置，`cache: no-store` 确保刷新后读取最新内容。
+2. `src/course.ts` 校验字段类型、颜色对比度、图片地址、页面跳转和明细引用；无效配置停止渲染并显示错误。
+3. `src/main.tsx` 根据 `slides[].type` 选择 `cover`、`content`、`chart`、`quiz` 或 `cta` 通用渲染器。
+4. `src/session.ts` 根据数组顺序、`next` 和 `goto` 计算下一页，不包含固定课程路径。
+5. `/print` 遍历同一份 `slides[]`，同时展开所有答题分支和图表明细。
+
+现场换课时，用另一门课程配置覆盖 `public/course.json` 并刷新页面，即可同时替换标题、文字、品牌、页面数量、图表和分支。仓库使用 `fixtures/course-alt.json` 验证非咖啡课程可以通过相同代码完成加载、渲染和打印。
+
+## 前端服务（考题主交付）
+
+前端课件是本项目的主要交付物，负责课程播放、JSON 换课、答题分支、图表钻取、工具页和 PDF 打印。运行前需要 Node.js 24 或更高版本及 npm。
+
+首次安装依赖：
 
 ```bash
 npm install
+```
+
+启动前端开发服务：
+
+```bash
 npm run dev
 ```
 
-`npm run dev` 是纯静态教学预览，记录功能自动降级。需要本地增量记录时运行：
+按终端显示的地址打开 `/course`；Vite 默认使用 `http://localhost:5173`，端口被占用时会自动选择其他端口。可直接访问：
+
+- `/course`：播放和测试课件。
+- `/tools`：检查素材并进入导出页面。
+- `/print`：查看完整打印版。
+
+`npm run dev` 只启动前端，不启动学习日志 API。这不影响考题要求的课程播放、互动、JSON 替换和 PDF 导出。
+
+验证生产构建：
+
+```bash
+npm run build
+npm start
+```
+
+## 日志服务（独立增强）
+
+学习日志不是前端课件运行的前置条件。需要记录页面停留、答题和图表操作时，使用：
 
 ```bash
 npm run local
 ```
 
-本地服务会在 `records/` 为每次课程运行新建一个 JSON 文件，并在页面离开、答题、图表明细操作发生时立即更新。
+该命令先构建前端，再由 `server.mjs` 同时提供构建产物和 `/api`。默认地址是 `http://localhost:4173`，可通过 `PORT` 环境变量修改。每次打开课程会在 `records/` 新建一个 JSON 文件，并在交互发生时持续更新。
+
+如果日志服务未启动，前端仍正常运行；首次创建记录失败后，当前页面会停止继续发送日志，不生成记录文件，也不会自动重试。启动日志服务后刷新 `/course` 即可重新连接。
 
 ## 导出 PDF
 
@@ -36,31 +109,6 @@ npm run export:pdf
 - `/course`：教学内容、答题分支和图表钻取。
 - `/tools`：记录状态、素材校验和完整打印入口，不属于教学路径。
 - `/print`：全部页面定义、分支和图表明细；确认所有图片加载后再调用浏览器打印。生成的 PDF 已包含图片，离线打开不需要联网。
-
-## 替换课程
-
-只修改 `public/course.json`、不修改任何代码，即可更换课程文字、品牌、图片、页序、图表、分支和 CTA。页面类型支持 `cover`、`content`、`chart`、`quiz`、`cta`。
-
-图片地址支持站内路径、HTTPS 远程图片和 base64 raster `data:image/...`。若要求只交付一个 JSON，使用 HTTPS 或 data 图片；使用新的站内路径时仍需把对应文件放入 `public/`。远程图片服务器必须允许公开访问；页面使用 `no-referrer` 请求，导出时若任何图片失败会阻止打印并显示失败地址。地址中的反斜杠会被拒绝，避免浏览器把伪装的站内路径解释成远程地址。
-
-### JSON 字段
-
-- `course`：`id`、`version`、`title`、`presenter` 和 `brand`。
-- `brand`：必填 `primary`、`accent`、`background`、`text`、`logo`；可选 `surface`、`muted`、`line`、`chartColors`。颜色使用 `#RGB` 或 `#RRGGBB`，正文/标题/次要文字与浅色表面的组合必须达到 `4.5:1`。
-- `ui`：导航、选择、统计、图表明细、打印和图片错误等可见标签。
-- `slides[]`：通用字段为 `id`、`type`、可选 `kicker` 和 `next`；数组顺序决定默认页序。
-- `cover`：`title`，以及可选 `subtitle`、`topics`、`image`、`imageAlt`。
-- `content`：`title`、`bullets`，以及可选 `image`、`imageAlt`。
-- `chart`：`title` 和 `chart.kind/unit/clickable/series[]`；`series` 不得为空，每项包含 `label`、非负有限数值 `value`、指向自有 `details` 项的 `detail`。
-- `quiz`：`question`、可选 `description` 和 `options[]`；每项包含 `id`、`text`、`goto`、可选的非负整数 `initialVotes`。
-- `cta`：`title`、`body`、`action.label`、`action.href`。
-- `details`：图表明细表；每项包含 `title` 和 `facts[]`。
-
-CTA 允许站内/相对地址、页内锚点、HTTPS、`mailto:` 和 `tel:`。配置加载时会拒绝 HTTP 图片、HTTP CTA、脚本协议、反斜杠地址、低对比度品牌色和悬空的页面/明细引用。
-
-替换后运行 `npm test` 和 `npm run build`。`fixtures/course-coffee.json` 保存替换前课程，`fixtures/course-alt.json` 保存含缺失素材测试场景的非咖啡配置；工具页只检查站内素材，远程图片在实际加载和打印前检查。
-
-`public/sources.json` 保存课程文案和素材（包括远程图片 URL）的来源审计信息；当前示例内容标注为 AI 生成。
 
 ## 验证
 
@@ -81,4 +129,4 @@ npm run build
 - `fixtures/`、`examples/`：替换课程与学习记录示例。
 - `docs/`、`DESIGN.md`：硬约束、规格、计划与视觉契约。
 - `records/`：本地运行时生成的会话文件（已被 Git 忽略）。
-- `scripts/export-pdf.mjs`：本地一键 PDF 导出脚本；`exports/`：生成的 PDF（已被 Git 忽略）。
+- `scripts/export-pdf.mjs`：本地一键 PDF 导出脚本；`exports/course.pdf`：纳入 Git 跟踪的正式交付 PDF。
