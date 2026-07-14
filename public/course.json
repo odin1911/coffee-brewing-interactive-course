@@ -1,0 +1,138 @@
+{
+  "course": {
+    "id": "coffee-brewing-101",
+    "version": "1.0.0",
+    "title": "咖啡冲煮入门",
+    "presenter": "冲煮手记",
+    "brand": {
+      "primary": "#4A2C1A",
+      "accent": "#D89A4E",
+      "background": "#F7F0E5",
+      "text": "#2B211B",
+      "logo": "assets/logo.svg"
+    }
+  },
+  "ui": {
+    "navigation": "课程导航",
+    "previous": "上一页",
+    "next": "下一页",
+    "continue": "继续",
+    "showDetail": "查看明细",
+    "closeDetail": "关闭明细",
+    "exportPdf": "导出 PDF",
+    "openTools": "打开工具页",
+    "recordStatus": "记录状态",
+    "restartCourse": "重新开始",
+    "validationResult": "配置校验"
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "type": "cover",
+      "title": "把变量，冲成一杯可重复的风味。",
+      "subtitle": "从产区风味、冲煮变量到一份自己的记录，用八页建立第一套手冲判断。",
+      "image": "assets/coffee-hero.png",
+      "imageAlt": "暖光下的陶瓷手冲滤杯与咖啡壶"
+    },
+    {
+      "id": "taste",
+      "type": "content",
+      "title": "先描述，再调整。",
+      "bullets": [
+        "香气是入口前的线索：花香、果香、坚果或可可。",
+        "酸质决定明亮感，甜感决定余韵是否圆润。",
+        "先写下感受，再改变参数，记录才有可比性。"
+      ],
+      "next": "steps"
+    },
+    {
+      "id": "steps",
+      "type": "content",
+      "title": "手冲咖啡的基本步骤。",
+      "bullets": [
+        "称豆、研磨、闷蒸：先让咖啡粉均匀吸水。",
+        "分段注水：保持稳定水位，避免冲穿粉床。",
+        "结束过滤：记录总时长、重量和第一口感受。"
+      ],
+      "next": "chart"
+    },
+    {
+      "id": "chart",
+      "type": "chart",
+      "title": "常见饮品的咖啡因含量",
+      "chart": {
+        "kind": "bar",
+        "unit": "mg",
+        "clickable": true,
+        "series": [
+          { "label": "意式浓缩", "value": 63, "detail": "espresso" },
+          { "label": "手冲", "value": 145, "detail": "pour" },
+          { "label": "冷萃", "value": 200, "detail": "cold" }
+        ]
+      },
+      "next": "quiz"
+    },
+    {
+      "id": "quiz",
+      "type": "quiz",
+      "question": "你平时怎么喝咖啡？",
+      "options": [
+        { "id": "basic", "text": "速溶 / 不常喝", "goto": "basic", "initialVotes": 12 },
+        { "id": "pro", "text": "手冲 / 意式", "goto": "pro", "initialVotes": 8 }
+      ]
+    },
+    {
+      "id": "basic",
+      "type": "content",
+      "title": "从一杯稳定的配方开始。",
+      "bullets": [
+        "先固定 15g 咖啡粉、240g 水和中细研磨。",
+        "用三段注水完成约 2 分 30 秒的冲煮。",
+        "每次只调整研磨度，比较酸甜和余韵。"
+      ],
+      "next": "extraction"
+    },
+    {
+      "id": "pro",
+      "type": "content",
+      "title": "从变量之间的关系开始。",
+      "bullets": [
+        "先记录粉水比、总时长和每段注水重量。",
+        "酸涩同时出现时，先检查流速和搅动，而不是只加水温。",
+        "保留一次基准配方，再做单变量实验。"
+      ],
+      "next": "extraction"
+    },
+    {
+      "id": "extraction",
+      "type": "chart",
+      "title": "不同冲煮方式的萃取率",
+      "chart": {
+        "kind": "bar",
+        "unit": "%",
+        "clickable": true,
+        "series": [
+          { "label": "意式浓缩", "value": 20, "detail": "yield-espresso" },
+          { "label": "手冲", "value": 21, "detail": "yield-pour" },
+          { "label": "冷萃", "value": 19, "detail": "yield-cold" }
+        ]
+      },
+      "next": "summary"
+    },
+    {
+      "id": "summary",
+      "type": "cta",
+      "title": "一杯稳定，来自一次清楚的改变。",
+      "body": "你已经完成第一轮判断。把下一杯只改变的一个变量写下来，带着判断继续练习。",
+      "action": { "label": "再冲一杯", "href": "/course" }
+    }
+  ],
+  "details": {
+    "espresso": { "title": "意式浓缩 · 63 mg", "facts": ["参考容量约 30 ml", "高压短时萃取", "单份总量不一定最高"] },
+    "pour": { "title": "手冲 · 145 mg", "facts": ["参考容量约 240 ml", "重力过滤萃取", "饮用总量影响摄入"] },
+    "cold": { "title": "冷萃 · 200 mg", "facts": ["参考容量约 350 ml", "低温长时浸泡", "配方与稀释比例差异较大"] }
+    ,"yield-espresso": { "title": "意式浓缩 · 20%", "facts": ["高压短时萃取", "细粉与压力共同影响流速", "以入口浓度和余韵判断"] },
+    "yield-pour": { "title": "手冲 · 21%", "facts": ["重力过滤萃取", "水流和研磨度决定接触时间", "以甜感和清晰度判断"] },
+    "yield-cold": { "title": "冷萃 · 19%", "facts": ["低温长时浸泡", "浸泡时间与稀释比例差异较大", "以顺滑度和尾韵判断"] }
+  }
+}

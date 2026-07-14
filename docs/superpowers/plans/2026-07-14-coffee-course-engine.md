@@ -10,8 +10,8 @@
 
 ## Global Constraints
 
-- The formal implementation timebox is 4 hours; Open Design setup happens before the timebox.
-- Open Design produces only `DESIGN.md` and three reference pages; it is not a runtime dependency.
+- The formal implementation timebox is 4 hours; design inputs are generated before the timebox.
+- Local design skills produce only `DESIGN.md` and three reference pages; they are not runtime dependencies.
 - All course text, UI labels, page order, image paths, brand colors, and chart data come from `public/course.json`.
 - Runtime content and assets are local; the app makes no runtime AI or third-party content requests.
 - `/course` contains only teaching content; `/tools` and `/print` are not teaching slides.
@@ -23,7 +23,7 @@
 
 ## Execution Budget
 
-- Before exam: Task 0, 60–90 minutes, with the 20-minute Open Design stop-loss.
+- Before exam: Task 0, 30–45 minutes.
 - Exam minute 0–25: Task 1.
 - Minute 25–50: Task 2.
 - Minute 50–85: Task 3.
@@ -91,7 +91,7 @@ At each task boundary, stop visual polishing when its budget expires and preserv
 
 ---
 
-### Task 0: Prepare Open Design Outputs Before the Four-Hour Timebox
+### Task 0: Prepare Design Inputs Before the Four-Hour Timebox
 
 **Files:**
 - Create: `DESIGN.md`
@@ -105,21 +105,9 @@ At each task boundary, stop visual polishing when its budget expires and preserv
 - Consumes: Approved visual direction from `docs/superpowers/specs/2026-07-14-coffee-course-engine-design.md`.
 - Produces: Stable color, type, spacing, motion, and accessibility rules used by Task 3; two local raster assets referenced by `course.json`.
 
-- [ ] **Step 1: Install and smoke-test Open Design outside the exam clock**
+- [ ] **Step 1: Generate the design contract and three reference pages**
 
-Install the official desktop release from `https://github.com/nexu-io/open-design/releases`. In Open Design Settings, copy the Codex MCP configuration rather than relying on the ambiguous macOS `/usr/bin/od` executable. Run this exact generation brief:
-
-```text
-Create a single-screen HTML card titled “Open Design smoke test”.
-Use a cream background, dark coffee-brown text, one amber button,
-and no external assets. Return valid HTML that renders locally.
-```
-
-Expected: the right-side preview renders the card and the HTML can be saved locally. Stop after 20 minutes if installation or Codex connectivity is still failing.
-
-- [ ] **Step 2: Generate the design contract and three reference pages**
-
-Use this exact Open Design brief:
+Use the local `reference-design-contract` skill for the contract and `frontend-design` for the HTML references. Keep the workflow file-only with no external service. Use this exact brief:
 
 ```text
 Create DESIGN.md plus three standalone 16:9 HTML reference pages for a
@@ -134,7 +122,7 @@ mode, glassmorphism, or dashboard chrome.
 
 Save the outputs at the exact paths in this task. Reference pages are design evidence, not application code.
 
-- [ ] **Step 3: Use imagegen for local visual assets**
+- [ ] **Step 2: Use imagegen for local visual assets**
 
 Invoke the `imagegen` skill twice with these briefs:
 
@@ -149,9 +137,9 @@ centered on transparent background, no letters, no watermark.
 
 Save the outputs as `public/assets/coffee-hero.png` and `public/assets/logo.png`.
 
-- [ ] **Step 4: Apply the deterministic fallback if Open Design is unavailable**
+- [ ] **Step 3: Apply the deterministic minimum if generated output is incomplete**
 
-If Step 1 exceeds 20 minutes, create `DESIGN.md` with this complete fallback instead of troubleshooting further:
+Use this verified minimum to complete `DESIGN.md` instead of spending the exam window on design iteration:
 
 ```markdown
 # Warm Editorial Course Design
@@ -190,7 +178,7 @@ Also create the three required fallback references so the design evidence remain
 <!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>答题参考</title><style>*{box-sizing:border-box}body{margin:0;background:#1E1814;display:grid;place-items:center;min-height:100vh;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.stage{width:min(96vw,160vh);aspect-ratio:16/9;background:#F7F0E5;color:#2B211B;padding:64px;border-radius:18px}h1{color:#4A2C1A;font-size:50px;margin:0 0 34px}.option{display:block;width:58%;margin:14px 0;padding:18px 22px;text-align:left;border:2px solid #4A2C1A;border-radius:14px;background:#FFF9F0;color:#2B211B;font-size:23px}.selected{background:#4A2C1A;color:#fff}.result{display:grid;grid-template-columns:170px 1fr 54px;align-items:center;gap:16px;width:72%;font-size:21px;margin-top:22px}.track{height:18px;background:#E6D7C7;border-radius:99px}.fill{height:100%;background:#D89A4E;border-radius:99px}</style><main class="stage"><h1>你平时怎么喝咖啡？</h1><button class="option selected">速溶 / 不常喝</button><button class="option">手冲 / 意式</button><div class="result"><span>速溶 / 不常喝</span><div class="track"><div class="fill" style="width:62%"></div></div><strong>62%</strong></div><div class="result"><span>手冲 / 意式</span><div class="track"><div class="fill" style="width:38%"></div></div><strong>38%</strong></div></main></html>
 ```
 
-- [ ] **Step 5: Verify and commit design inputs**
+- [ ] **Step 4: Verify and commit design inputs**
 
 Run:
 

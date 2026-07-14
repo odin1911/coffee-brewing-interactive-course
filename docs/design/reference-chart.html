@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>咖啡冲煮入门 · 图表参考</title>
+  <style>
+    :root{--canvas:#F7F0E5;--surface:#FFF9F0;--ink:#2B211B;--muted:#6B5545;--primary:#4A2C1A;--accent:#D89A4E;--clay:#A95532;--olive:#65704B;--line:#D8C7B5;--focus:#B95F18}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#1D1814;color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.stage{width:min(96vw,160vh);aspect-ratio:16/9;position:relative;overflow:hidden;padding:52px 74px 52px 58px;background:var(--canvas);border:1px solid var(--line);border-radius:18px}.top{display:flex;justify-content:space-between;align-items:flex-start;padding-right:18px}.eyebrow{margin:0 0 12px;color:var(--muted);font:700 15px/1.4 "SFMono-Regular",Consolas,monospace;letter-spacing:.12em}.top h1{margin:0;color:var(--primary);font-family:"Songti SC","STSong",serif;font-size:clamp(38px,4vw,58px);line-height:1.1;letter-spacing:-.025em}.unit{color:var(--muted);font:700 14px/1.3 "SFMono-Regular",Consolas,monospace}.layout{height:calc(100% - 106px);display:grid;grid-template-columns:minmax(0,8fr) minmax(280px,4fr);gap:32px;margin-top:26px}.plot{position:relative;display:grid;grid-template-columns:58px 1fr;grid-template-rows:1fr 42px;border-bottom:1px solid var(--primary)}.axis{grid-row:1;display:flex;flex-direction:column;justify-content:space-between;padding:0 10px 8px 0;color:var(--muted);font:700 13px/1 "SFMono-Regular",Consolas,monospace;text-align:right}.grid{position:absolute;left:58px;right:0;top:0;bottom:42px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}.grid i{display:block;border-top:1px dashed #CDBBA6}.bars{grid-column:2;grid-row:1;display:flex;align-items:end;justify-content:space-around;gap:22px;padding:0 34px 8px}.bar{z-index:1;width:min(8vw,112px);min-width:72px;border:0;border-radius:10px 10px 0 0;color:var(--ink);cursor:pointer;position:relative;transition:transform 160ms ease,outline-color 160ms ease}.bar:nth-child(1){height:31.5%;background:var(--clay)}.bar:nth-child(2){height:72.5%;background:var(--accent)}.bar:nth-child(3){height:100%;background:var(--olive)}.bar strong{position:absolute;left:50%;top:-34px;transform:translateX(-50%);color:var(--primary);font:800 17px/1 "SFMono-Regular",Consolas,monospace}.bar span{position:absolute;left:50%;top:calc(100% + 15px);transform:translateX(-50%);white-space:nowrap;color:var(--ink);font-size:17px;font-weight:700}.bar[aria-pressed="true"]{outline:4px solid var(--primary);outline-offset:4px;transform:translateY(-5px)}.bar:focus-visible,.close:focus-visible{outline:3px solid var(--focus);outline-offset:4px}.detail{align-self:stretch;padding:28px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;display:flex;flex-direction:column}.detail .tag{margin:0;color:var(--muted);font:700 13px/1.4 "SFMono-Regular",Consolas,monospace;letter-spacing:.12em}.detail h2{margin:16px 0 6px;color:var(--primary);font-family:"Songti SC","STSong",serif;font-size:36px}.value{margin:0 0 24px;color:var(--primary);font:800 24px/1.2 "SFMono-Regular",Consolas,monospace}.detail ul{margin:0;padding-left:1.2em;display:grid;gap:13px;font-size:18px;line-height:1.45}.close{margin-top:auto;align-self:flex-start;border:1px solid var(--primary);border-radius:10px;padding:10px 15px;background:transparent;color:var(--primary);font-weight:700}.rail{position:absolute;right:18px;top:44px;bottom:44px;width:20px;border-left:1px solid var(--line);color:var(--primary);font:700 12px/1 "SFMono-Regular",Consolas,monospace}.rail span{position:absolute;left:-7px;top:25%;padding:6px 0;background:var(--canvas)}
+    @media(max-width:800px){body{display:block;background:var(--canvas)}.stage{width:100%;min-height:100vh;aspect-ratio:auto;border:0;border-radius:0;padding:28px}.layout{height:auto;grid-template-columns:1fr}.plot{height:440px}.detail{min-height:300px}.rail{display:none}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <header class="top"><div><p class="eyebrow">变量观察 · 03</p><h1>常见饮品咖啡因含量</h1></div><span class="unit">单位 · mg</span></header>
+    <div class="layout">
+      <section class="plot" aria-label="咖啡因含量柱状图">
+        <div class="axis"><span>200</span><span>150</span><span>100</span><span>50</span><span>0</span></div><div class="grid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="bars">
+          <button class="bar" data-key="espresso" aria-pressed="false" aria-label="查看意式浓缩，63毫克"><strong>63</strong><span>意式浓缩</span></button>
+          <button class="bar" data-key="pour" aria-pressed="true" aria-label="查看手冲，145毫克"><strong>145</strong><span>手冲</span></button>
+          <button class="bar" data-key="cold" aria-pressed="false" aria-label="查看冷萃，200毫克"><strong>200</strong><span>冷萃</span></button>
+        </div>
+      </section>
+      <aside class="detail" aria-live="polite"><p class="tag">当前明细</p><h2 id="title">手冲</h2><p class="value" id="value">145 mg</p><ul id="facts"><li>参考容量约 240 ml</li><li>重力过滤萃取</li><li>饮用总量影响摄入</li></ul><button class="close" type="button">关闭明细</button></aside>
+    </div>
+    <aside class="rail" aria-label="第 3 页，共 8 页"><span>03 / 08</span></aside>
+  </main>
+  <script>
+    const details={espresso:{title:'意式浓缩',value:'63 mg',facts:['参考容量约 30 ml','高压短时萃取','单份总量不一定最高']},pour:{title:'手冲',value:'145 mg',facts:['参考容量约 240 ml','重力过滤萃取','饮用总量影响摄入']},cold:{title:'冷萃',value:'200 mg',facts:['参考容量约 350 ml','低温长时浸泡','配方与稀释比例差异较大']}};
+    document.querySelectorAll('.bar').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('.bar').forEach(item=>item.setAttribute('aria-pressed','false'));button.setAttribute('aria-pressed','true');const detail=details[button.dataset.key];document.querySelector('#title').textContent=detail.title;document.querySelector('#value').textContent=detail.value;document.querySelector('#facts').replaceChildren(...detail.facts.map(text=>Object.assign(document.createElement('li'),{textContent:text})));}));
+  </script>
+</body>
+</html>

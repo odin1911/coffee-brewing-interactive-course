@@ -1,0 +1,13 @@
+{
+  "sessionId": "example-session",
+  "courseId": "coffee-brewing-101",
+  "status": "in_progress",
+  "startedAt": "2026-07-14T05:00:00.000Z",
+  "updatedAt": "2026-07-14T05:01:12.000Z",
+  "totalActiveMs": 72000,
+  "slideSegments": [
+    { "slideId": "cover", "durationMs": 72000, "timestamp": "2026-07-14T05:01:12.000Z" }
+  ],
+  "featureEvents": [],
+  "answers": []
+}

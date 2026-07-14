@@ -1,0 +1,4 @@
+@media print {
+  @page { size: 16in 9in; margin: 0; }
+  .asset-error { color: #A95532; font-weight: 700; }
+}

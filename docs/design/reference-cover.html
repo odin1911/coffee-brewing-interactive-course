@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>咖啡冲煮入门 · 封面参考</title>
+  <style>
+    :root{--canvas:#F7F0E5;--surface:#FFF9F0;--ink:#2B211B;--muted:#6B5545;--primary:#4A2C1A;--accent:#D89A4E;--line:#D8C7B5;--focus:#B95F18}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#1D1814;color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+    .stage{width:min(96vw,160vh);aspect-ratio:16/9;position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,7fr) minmax(300px,5fr);gap:52px;padding:62px 78px 62px 68px;background:var(--canvas);border:1px solid var(--line);border-radius:18px}
+    .copy{align-self:center;max-width:760px}.mark{display:flex;align-items:center;gap:12px;margin-bottom:42px;color:var(--primary);font:700 16px/1.3 "SFMono-Regular",Consolas,monospace;letter-spacing:.08em}.bean{width:30px;height:22px;border:2px solid var(--primary);border-radius:55% 45% 55% 45%;transform:rotate(-18deg);position:relative}.bean:after{content:"";position:absolute;left:13px;top:1px;width:2px;height:17px;background:var(--primary);transform:rotate(18deg)}
+    .eyebrow{margin:0 0 18px;color:var(--muted);font-weight:700;letter-spacing:.16em}.copy h1{margin:0;max-width:680px;color:var(--primary);font-family:"Songti SC","STSong",serif;font-size:clamp(58px,6vw,92px);line-height:1.02;letter-spacing:-.045em}.lede{max-width:620px;margin:28px 0 0;font-size:clamp(21px,2vw,29px);line-height:1.55}.path{display:flex;align-items:center;gap:14px;margin-top:40px;color:var(--primary);font-weight:700;font-size:18px}.path i{width:32px;height:1px;background:var(--accent)}
+    .visual{align-self:stretch;position:relative;display:grid;place-items:center}.filter{width:min(33vw,420px);aspect-ratio:1;border-radius:50%;position:relative;background:var(--surface);border:1px solid var(--line);box-shadow:0 24px 70px #4A2C1A1A}.filter:before,.filter:after{content:"";position:absolute;border-radius:50%;inset:13%;border:22px solid #E8D8C4}.filter:after{inset:28%;border:0;background:var(--primary);box-shadow:inset 0 0 0 18px #6B4229}.bloom{position:absolute;inset:38%;z-index:2;border-radius:50%;background:var(--accent);border:6px solid #F0BC76}.note{position:absolute;left:0;bottom:28px;max-width:220px;padding:16px 18px;background:var(--surface);color:var(--ink);border:1px solid var(--line);font-size:16px;line-height:1.5;transform:rotate(-2deg)}
+    .rail{position:absolute;right:22px;top:48px;bottom:48px;width:28px;display:flex;flex-direction:column;align-items:center;color:var(--muted);font:700 12px/1 "SFMono-Regular",Consolas,monospace}.rail:before{content:"";position:absolute;top:28px;bottom:28px;width:1px;background:var(--line)}.rail strong,.rail span{position:relative;background:var(--canvas);padding:8px 0}.rail strong{color:var(--primary);font-size:14px}.rail span{margin-top:auto}.ticks{position:absolute;inset:54px 0;display:flex;flex-direction:column;justify-content:space-between}.ticks i{display:block;width:10px;height:2px;background:var(--line)}.ticks i:first-child{width:18px;height:4px;background:var(--accent)}
+    @media(max-width:800px){body{display:block;background:var(--canvas)}.stage{width:100%;min-height:100vh;aspect-ratio:auto;border:0;border-radius:0;grid-template-columns:1fr;padding:34px 48px 34px 28px}.visual{min-height:340px}.filter{width:min(78vw,360px)}.rail{right:12px}.copy h1{font-size:54px}}
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <section class="copy">
+      <div class="mark"><span class="bean" aria-hidden="true"></span><span>BREW NOTE · 01</span></div>
+      <p class="eyebrow">咖啡冲煮入门</p>
+      <h1>把变量，冲成一杯可重复的风味。</h1>
+      <p class="lede">从产区风味、冲煮变量到一份自己的记录，用八页建立第一套手冲判断。</p>
+      <div class="path"><span>风味</span><i></i><span>变量</span><i></i><span>记录</span></div>
+    </section>
+    <figure class="visual" aria-label="从滤纸俯视角抽象出的咖啡粉层与闷蒸中心">
+      <div class="filter"><div class="bloom"></div></div>
+      <figcaption class="note">先固定配方。<br>每次只改变一个变量。</figcaption>
+    </figure>
+    <aside class="rail" aria-label="第 1 页，共 8 页"><strong>01</strong><div class="ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span>08</span></aside>
+  </main>
+</body>
+</html>

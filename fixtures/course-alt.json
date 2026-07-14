@@ -1,0 +1,17 @@
+{
+  "course": {
+    "id": "weather-safety-101",
+    "version": "1.0.0",
+    "title": "家庭防灾入门",
+    "presenter": "应急手记",
+    "brand": { "primary": "#17324D", "accent": "#D78B3C", "background": "#EEF4F7", "text": "#17212B", "logo": "assets/logo.svg" }
+  },
+  "ui": {
+    "navigation": "课程导航", "previous": "上一页", "next": "下一页", "continue": "继续", "showDetail": "查看明细", "closeDetail": "关闭明细", "exportPdf": "导出 PDF", "openTools": "打开工具页", "recordStatus": "记录状态", "restartCourse": "重新开始", "validationResult": "配置校验"
+  },
+  "slides": [
+    { "id": "cover", "type": "cover", "title": "先准备，再应对。", "subtitle": "把家庭防灾拆成三件今天就能完成的小事。", "image": "assets/missing-weather.png", "imageAlt": "防灾用品" },
+    { "id": "end", "type": "cta", "title": "今天先完成一件。", "body": "把手电、饮水和联系人写在同一张清单上。", "action": { "label": "重新查看", "href": "/course" } }
+  ],
+  "details": {}
+}

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>咖啡冲煮入门 · 答题参考</title>
+  <style>
+    :root{--canvas:#F7F0E5;--surface:#FFF9F0;--ink:#2B211B;--muted:#6B5545;--primary:#4A2C1A;--accent:#D89A4E;--line:#D8C7B5;--focus:#B95F18}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#1D1814;color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif}.stage{width:min(96vw,160vh);aspect-ratio:16/9;position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(300px,5fr) minmax(460px,7fr);gap:48px;padding:58px 76px 54px 62px;background:var(--canvas);border:1px solid var(--line);border-radius:18px}.prompt{display:flex;flex-direction:column}.eyebrow{margin:0 0 26px;color:var(--muted);font:700 15px/1.4 "SFMono-Regular",Consolas,monospace;letter-spacing:.12em}.prompt h1{margin:0;color:var(--primary);font-family:"Songti SC","STSong",serif;font-size:clamp(42px,4.4vw,66px);line-height:1.08;letter-spacing:-.03em}.context{max-width:470px;margin:30px 0 0;color:var(--muted);font-size:20px;line-height:1.55}.rule{margin-top:auto;padding-top:22px;border-top:1px solid var(--line);color:var(--primary);font-weight:700;font-size:17px}.panel{align-self:stretch;display:flex;flex-direction:column;gap:16px}.choice{width:100%;min-height:78px;display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border:2px solid #A98D72;border-radius:14px;background:var(--surface);color:var(--ink);font-size:20px;font-weight:700;text-align:left;cursor:pointer}.choice small{color:var(--muted);font:700 13px/1.2 "SFMono-Regular",Consolas,monospace}.choice[aria-pressed="true"]{border-color:var(--primary);background:var(--primary);color:#fff}.choice[aria-pressed="true"] small{color:#F7F0E5}.choice:focus-visible,.continue:focus-visible{outline:3px solid var(--focus);outline-offset:3px}.results{margin-top:4px;padding:20px 22px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px}.results h2{margin:0 0 16px;color:var(--primary);font-size:18px}.result{display:grid;grid-template-columns:150px 1fr 68px;align-items:center;gap:14px;margin-top:12px;font-size:16px}.track{height:12px;background:#E8DCCB;border-radius:99px;overflow:hidden}.fill{height:100%;background:var(--accent);border-radius:inherit;transition:width 180ms ease}.result strong{text-align:right;color:var(--primary);font:800 14px/1 "SFMono-Regular",Consolas,monospace}.actions{margin-top:auto;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:15px}.continue{border:0;border-radius:12px;padding:14px 24px;background:var(--primary);color:#fff;font-size:18px;font-weight:800;cursor:pointer}.continue:disabled{opacity:.45;cursor:not-allowed}.rail{position:absolute;right:18px;top:44px;bottom:44px;width:20px;border-left:1px solid var(--line);color:var(--primary);font:700 12px/1 "SFMono-Regular",Consolas,monospace}.rail span{position:absolute;left:-7px;top:50%;padding:6px 0;background:var(--canvas)}
+    @media(max-width:800px){body{display:block;background:var(--canvas)}.stage{width:100%;min-height:100vh;aspect-ratio:auto;border:0;border-radius:0;grid-template-columns:1fr;padding:30px}.prompt{min-height:360px}.panel{min-height:560px}.rail{display:none}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <section class="prompt"><p class="eyebrow">路径选择 · 05</p><h1>你平时怎么喝咖啡？</h1><p class="context">答案没有对错。它只决定下一页先讲固定配方，还是先讲变量对比。</p><p class="rule">选择后先看全班结果，再由讲师继续。</p></section>
+    <section class="panel" aria-label="答题与即时结果">
+      <button class="choice" data-key="basic" aria-pressed="true"><span>速溶 / 不常喝</span><small>已选择</small></button>
+      <button class="choice" data-key="pro" aria-pressed="false"><span>手冲 / 意式</span><small>选择</small></button>
+      <div class="results" aria-live="polite"><h2>当前结果 · 21 人</h2><div class="result"><span>速溶 / 不常喝</span><div class="track"><div class="fill" id="basic-fill" style="width:61.9%"></div></div><strong id="basic-value">13 · 62%</strong></div><div class="result"><span>手冲 / 意式</span><div class="track"><div class="fill" id="pro-fill" style="width:38.1%"></div></div><strong id="pro-value">8 · 38%</strong></div></div>
+      <div class="actions"><span id="branch">下一页：入门路径建议</span><button class="continue" type="button">继续</button></div>
+    </section>
+    <aside class="rail" aria-label="第 5 页，共 8 页"><span>05 / 08</span></aside>
+  </main>
+  <script>
+    const initial={basic:12,pro:8};
+    document.querySelectorAll('.choice').forEach(button=>button.addEventListener('click',()=>{const selected=button.dataset.key;document.querySelectorAll('.choice').forEach(item=>{const active=item===button;item.setAttribute('aria-pressed',String(active));item.querySelector('small').textContent=active?'已选择':'选择'});const total=initial.basic+initial.pro+1;for(const key of ['basic','pro']){const votes=initial[key]+(key===selected?1:0);const percent=Math.round(votes/total*100);document.querySelector(`#${key}-fill`).style.width=`${percent}%`;document.querySelector(`#${key}-value`).textContent=`${votes} · ${percent}%`}document.querySelector('#branch').textContent=selected==='basic'?'下一页：入门路径建议':'下一页：进阶路径建议';}));
+  </script>
+</body>
+</html>
