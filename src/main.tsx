@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
 import { createRoot } from 'react-dom/client';
 import { assetUrl, courseTheme, CourseConfigError, findMissingAssets, imageReferrerPolicy, loadCourse, type ChartSlide, type CourseConfig, type QuizSlide, type Slide, type UiCopy } from './course';
-import { createCourseReducer, createInitialState, getNextSlideId } from './session';
+import { createCourseReducer, createInitialState, getNextSlideId, getWinningOptionId, type VoteCounts } from './session';
 import { SessionRecorder } from './recorder';
 import './styles.css';
 import './print.css';
@@ -45,7 +45,14 @@ export function CoursePage({ course }: { course: CourseConfig }) {
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);
 
-  const goNext = async () => { await recorder.current?.slideCompleted(slide.id); dispatch({ type: 'NEXT' }); };
+  const goNext = async () => {
+    if (slide.type === 'quiz') {
+      const winner = getWinningOptionId(slide, state.votes[slide.id]);
+      if (winner) await recorder.current?.answer(slide.id, winner);
+    }
+    await recorder.current?.slideCompleted(slide.id);
+    dispatch({ type: 'NEXT' });
+  };
   const goPrevious = async () => { await recorder.current?.slideCompleted(slide.id); dispatch({ type: 'PREVIOUS' }); };
 
   return (
@@ -60,7 +67,7 @@ export function CoursePage({ course }: { course: CourseConfig }) {
       <section className="stage" aria-labelledby="slide-title">
         <div className="rail" aria-label={pageNumber}><strong>{pageNumber}</strong></div>
         <div className="slide-body">
-          <SlideView course={course} slide={slide} pageNumber={pageNumber} answer={state.answers[slide.id]} detailId={detailId} onAnswer={(optionId) => { dispatch({ type: 'ANSWER', slideId: slide.id, optionId }); void recorder.current?.answer(slide.id, optionId); }} onDetail={(id) => { dispatch({ type: 'OPEN_DETAIL', detailId: id }); void recorder.current?.feature('chart_detail_open'); }} onCloseDetail={() => { dispatch({ type: 'CLOSE_DETAIL' }); void recorder.current?.feature('chart_detail_close'); }} />
+          <SlideView course={course} slide={slide} pageNumber={pageNumber} votes={state.votes[slide.id]} detailId={detailId} onVote={(optionId, delta) => dispatch({ type: 'VOTE', slideId: slide.id, optionId, delta })} onDetail={(id) => { dispatch({ type: 'OPEN_DETAIL', detailId: id }); void recorder.current?.feature('chart_detail_open'); }} onCloseDetail={() => { dispatch({ type: 'CLOSE_DETAIL' }); void recorder.current?.feature('chart_detail_close'); }} />
           <nav className="slide-nav" aria-label={course.ui.navigation}>
             <button type="button" onClick={goPrevious} disabled={state.visitedPath.length <= 1}>{course.ui.previous}</button>
             <span>{pageNumber}</span>
@@ -72,20 +79,20 @@ export function CoursePage({ course }: { course: CourseConfig }) {
   );
 }
 
-export function SlideView({ course, slide, pageNumber, answer, detailId, onAnswer, onDetail, onCloseDetail }: {
+export function SlideView({ course, slide, pageNumber, votes, detailId, onVote, onDetail, onCloseDetail }: {
   course: CourseConfig;
   slide: Slide;
   pageNumber: string;
-  answer?: string;
+  votes?: VoteCounts;
   detailId: string | null;
-  onAnswer: (optionId: string) => void;
+  onVote: (optionId: string, delta: 1 | -1) => void;
   onDetail: (detailId: string) => void;
   onCloseDetail: () => void;
 }) {
   if (slide.type === 'cover') return <div className="cover-grid"><div>{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.title}</h1>{slide.subtitle && <p className="lead">{slide.subtitle}</p>}{slide.topics && <div className="topic-line">{slide.topics.map((topic, index) => <span key={topic}>{index > 0 && <i />}{topic}</span>)}</div>}</div>{slide.image && <img className="hero-image" src={assetUrl(slide.image)} referrerPolicy={imageReferrerPolicy(slide.image)} alt={slide.imageAlt ?? ''} />}</div>;
   if (slide.type === 'content') return <div className="content-slide">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.title}</h1><ul className="lesson-list">{slide.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>{slide.image && <img className="content-image" src={assetUrl(slide.image)} referrerPolicy={imageReferrerPolicy(slide.image)} alt={slide.imageAlt ?? ''} />}</div>;
   if (slide.type === 'chart') return <ChartView slide={slide} course={course} pageNumber={pageNumber} detailId={detailId} onDetail={onDetail} onCloseDetail={onCloseDetail} />;
-  if (slide.type === 'quiz') return <QuizView slide={slide} ui={course.ui} pageNumber={pageNumber} answer={answer} onAnswer={onAnswer} />;
+  if (slide.type === 'quiz') return <QuizView slide={slide} ui={course.ui} pageNumber={pageNumber} votes={votes} onVote={onVote} />;
   return <div className="content-slide">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.title}</h1><p className="lead">{slide.body}</p></div>;
 }
 
@@ -97,9 +104,10 @@ export function ChartView({ slide, course, pageNumber, detailId, onDetail, onClo
   return <div className="chart-slide"><div className="chart-main">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.title}</h1><div className="bars" role="list" aria-label={`${slide.title} ${slide.chart.unit}`}>{slide.chart.series.map((item, index) => <button key={item.detail} type="button" className={item.detail === activeId ? 'bar active' : 'bar'} style={{ height: `${Math.max(25, item.value / max * 100)}%`, '--bar-color': colors[index % colors.length] } as CSSProperties} aria-label={`${course.ui.showDetail}: ${item.label}`} aria-pressed={item.detail === activeId} disabled={!slide.chart.clickable} onClick={() => onDetail(item.detail)}><strong>{item.value}{slide.chart.unit}</strong><span>{item.label}</span></button>)}</div></div>{detail && <aside className="detail-panel"><h2>{detail.title}</h2><ul>{detail.facts.map((fact) => <li key={fact}>{fact}</li>)}</ul><button type="button" onClick={onCloseDetail}>{course.ui.closeDetail}</button></aside>}</div>;
 }
 
-export function QuizView({ slide, ui, pageNumber, answer, onAnswer }: { slide: QuizSlide; ui: UiCopy; pageNumber: string; answer?: string; onAnswer: (optionId: string) => void }) {
-  const total = slide.options.reduce((sum, option) => sum + (option.initialVotes ?? 0), 0) + (answer ? 1 : 0);
-  return <div className="quiz-slide"><div className="quiz-prompt">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.question}</h1>{slide.description && <p className="lead">{slide.description}</p>}</div><div className="quiz-panel"><div className="choices">{slide.options.map((option) => <button key={option.id} type="button" aria-pressed={answer === option.id} className={answer === option.id ? 'choice selected' : 'choice'} onClick={() => onAnswer(option.id)}><span>{option.text}</span><small>{answer === option.id ? ui.selected : ui.select}</small></button>)}</div><div className="results"><h2>{ui.results} · {total} {ui.peopleUnit}</h2>{slide.options.map((option) => { const votes = (option.initialVotes ?? 0) + (answer === option.id ? 1 : 0); const percent = total ? Math.round(votes / total * 100) : 0; return <div className="result" key={option.id}><span>{option.text}</span><div className="track"><i style={{ width: `${percent}%` }} /></div><strong>{percent}%</strong></div>; })}</div></div></div>;
+export function QuizView({ slide, ui, pageNumber, votes = {}, onVote }: { slide: QuizSlide; ui: UiCopy; pageNumber: string; votes?: VoteCounts; onVote: (optionId: string, delta: 1 | -1) => void }) {
+  const total = slide.options.reduce((sum, option) => sum + (votes[option.id] ?? 0), 0);
+  const winner = getWinningOptionId(slide, votes);
+  return <div className="quiz-slide"><div className="quiz-prompt">{slide.kicker && <p className="eyebrow">{slide.kicker} · {pageNumber}</p>}<h1 id="slide-title">{slide.question}</h1>{slide.description && <p className="lead">{slide.description}</p>}</div><div className="quiz-panel"><div className="choices">{slide.options.map((option) => { const count = votes[option.id] ?? 0; const leading = winner === option.id; return <div key={option.id} style={{ display: 'grid', gridTemplateColumns: '1fr 64px', gap: 8 }}><button type="button" aria-pressed={leading} className={leading ? 'choice selected' : 'choice'} onClick={() => onVote(option.id, 1)}><span>{option.text}</span><small>{leading ? ui.selected : ui.select}</small></button><button type="button" className="vote-remove" style={{ minHeight: 48, border: '1px solid var(--primary)', borderRadius: 10, background: 'var(--surface)', color: 'var(--primary)', fontWeight: 800, cursor: count ? 'pointer' : 'not-allowed', opacity: count ? 1 : .35 }} aria-label={`−1 ${option.text}`} disabled={count === 0} onClick={() => onVote(option.id, -1)}>−1</button></div>; })}</div><div className="results" aria-live="polite"><h2>{ui.results} · {total} {ui.peopleUnit}</h2>{slide.options.map((option) => { const count = votes[option.id] ?? 0; const percent = total ? Math.round(count / total * 100) : 0; return <div className="result" style={{ gridTemplateColumns: '120px 1fr 100px' }} key={option.id}><span>{option.text}</span><div className="track"><i style={{ width: `${percent}%` }} /></div><strong>{count} {ui.peopleUnit} · {percent}%</strong></div>; })}</div></div></div>;
 }
 
 export async function waitForImages(images: HTMLImageElement[]): Promise<void> {

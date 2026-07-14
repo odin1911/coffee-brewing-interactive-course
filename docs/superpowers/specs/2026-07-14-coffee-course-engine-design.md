@@ -113,9 +113,9 @@
     "restartCourse": "重新开始课程",
     "validationResult": "配置校验结果",
     "backToCourse": "返回课程",
-    "select": "选择",
-    "selected": "已选择",
-    "results": "当前结果",
+    "select": "记一票",
+    "selected": "当前领先",
+    "results": "现场计票",
     "peopleUnit": "人",
     "imageLoadError": "图片加载失败，无法导出"
   },
@@ -130,7 +130,7 @@
 - `cover`：`title`，以及可选 `subtitle`、`topics`、`image`、`imageAlt`。
 - `content`：`title`、`bullets`、可选 `image` 和 `imageAlt`。
 - `chart`：`title`、`chart.kind`、`unit`、`clickable`、`series[]`。
-- `quiz`：`question`、可选 `description`、`options[]`；每个选项包含 `id`、`text`、`goto` 和可选 `initialVotes`。
+- `quiz`：`question`、可选 `description`、`options[]`；每个选项包含 `id`、`text` 和 `goto`。
 - `cta`：`title`、`body` 和 `action`；`action` 包含 `label` 与本地或公开 `href`，不包含引擎工具。
 
 页面默认按数组顺序前进。需要跳转或汇合的页面使用显式 `next`。每个图表数据项通过 `detail` 引用顶层 `details`。
@@ -152,7 +152,7 @@
 7. 不同冲煮方式萃取率与钻取。
 8. 教学总结与 CTA。
 
-答题选项将本次选择加入 JSON 提供的初始票数并显示结果。点击“继续”后按选项 `goto` 进入分支。后退使用实际 `visitedPath`，而不是配置数组索引。若返回答题页并修改答案，截断旧答案之后的路径，再进入新分支。
+答题选项从 0 票开始，由主讲人根据听众回答重复加票并减票纠错，页面即时显示现场票数和百分比。唯一最高票选项按 `goto` 进入分支；零票或平票时不能继续。后退使用实际 `visitedPath`，返回答题页修正票数后可进入新的最高票分支。
 
 图表柱形是可聚焦按钮。点击后展开对应详情并开始记录功能使用时长；关闭详情或离开页面时结束计时。打印模式不需要点击，直接展示全部详情。
 

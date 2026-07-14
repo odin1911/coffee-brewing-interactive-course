@@ -29,9 +29,9 @@
     "restartCourse": "重新开始",
     "validationResult": "配置校验",
     "backToCourse": "返回课程",
-    "select": "选择",
-    "selected": "已选择",
-    "results": "当前结果",
+    "select": "记一票",
+    "selected": "当前领先",
+    "results": "现场计票",
     "peopleUnit": "人",
     "imageLoadError": "图片加载失败，无法导出"
   },
@@ -95,8 +95,8 @@
       "question": "你平时怎么喝咖啡？",
       "description": "答案没有对错，它只决定下一页先讲固定配方，还是先讲变量对比。",
       "options": [
-        { "id": "basic", "text": "速溶 / 不常喝", "goto": "basic", "initialVotes": 12 },
-        { "id": "pro", "text": "手冲 / 意式", "goto": "pro", "initialVotes": 8 }
+        { "id": "basic", "text": "速溶 / 不常喝", "goto": "basic" },
+        { "id": "pro", "text": "手冲 / 意式", "goto": "pro" }
       ]
     },
     {

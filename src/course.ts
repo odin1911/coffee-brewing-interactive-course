@@ -17,7 +17,7 @@ export type ChartSlide = BaseSlide & {
 };
 export type QuizSlide = BaseSlide & {
   type: 'quiz'; question: string; description?: string;
-  options: Array<{ id: string; text: string; goto: string; initialVotes?: number }>;
+  options: Array<{ id: string; text: string; goto: string }>;
 };
 export type CtaSlide = BaseSlide & { type: 'cta'; title: string; body: string; action: { label: string; href: string } };
 export type Slide = CoverSlide | ContentSlide | ChartSlide | QuizSlide | CtaSlide;
@@ -132,7 +132,7 @@ export function validateCourse(input: unknown): CourseConfig {
         else for (const item of raw.chart.series) if (!record(item) || !text(item.label) || typeof item.value !== 'number' || !Number.isFinite(item.value) || item.value < 0 || !text(item.detail)) errors.push(`slides.${index} chart item is invalid`);
       } else if (raw.type === 'quiz') {
         if (!text(raw.question) || (raw.description !== undefined && !text(raw.description)) || !Array.isArray(raw.options) || raw.options.length < 2) errors.push(`slides.${index} quiz is invalid`);
-        else for (const option of raw.options) if (!record(option) || !text(option.id) || !text(option.text) || !text(option.goto) || (option.initialVotes !== undefined && (!Number.isInteger(option.initialVotes) || option.initialVotes < 0))) errors.push(`slides.${index} quiz option is invalid`);
+        else for (const option of raw.options) if (!record(option) || !text(option.id) || !text(option.text) || !text(option.goto)) errors.push(`slides.${index} quiz option is invalid`);
       } else if (raw.type === 'cta' && (!text(raw.title) || !text(raw.body) || !record(raw.action) || !text(raw.action.label) || !actionAddress(raw.action.href))) errors.push(`slides.${index} action.href is invalid`);
       else if (!['cover', 'content', 'chart', 'quiz', 'cta'].includes(raw.type)) errors.push(`slides.${index} unknown type: ${raw.type}`);
     }

@@ -123,14 +123,6 @@ describe('validateCourse', () => {
     expect(() => validateCourse(negative)).toThrow(/slides\.1 chart item is invalid/);
   });
 
-  it('rejects non-integer or negative initial votes', () => {
-    for (const initialVotes of ['3', -1, 1.5]) {
-      const input = structuredClone(valid);
-      input.slides[1].options[0].initialVotes = initialVotes;
-      expect(() => validateCourse(input)).toThrow(/slides\.1 quiz option is invalid/);
-    }
-  });
-
   it('returns every validation error', () => {
     expect(() => validateCourse({ slides: [] })).toThrow(CourseConfigError);
     try { validateCourse({ slides: [] }); } catch (error) {

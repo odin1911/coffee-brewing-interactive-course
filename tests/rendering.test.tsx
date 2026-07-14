@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import altJson from '../fixtures/course-alt.json';
 import courseJson from '../fixtures/course-coffee.json';
 import { courseTheme, validateCourse } from '../src/course';
-import { applyCourseTitle, ChartView, completeCourse, CoursePage, PrintPage, SlideView, ToolsPage, waitForImages } from '../src/main';
+import { applyCourseTitle, ChartView, completeCourse, CoursePage, PrintPage, QuizView, SlideView, ToolsPage, waitForImages } from '../src/main';
 
 const altCourse = validateCourse(altJson);
 const coffeeCourse = validateCourse(courseJson);
@@ -35,7 +35,7 @@ describe('JSON-driven presentation rendering', () => {
   it('renders the alternate course without coffee-course copy or colors', () => {
     const cover = altCourse.slides[0];
     const courseHtml = renderToStaticMarkup(
-      <SlideView course={altCourse} slide={cover} pageNumber="01" detailId={null} onAnswer={noop} onDetail={noop} onCloseDetail={noop} />
+      <SlideView course={altCourse} slide={cover} pageNumber="01" detailId={null} onVote={noop} onDetail={noop} onCloseDetail={noop} />
     );
     const printHtml = renderToStaticMarkup(<PrintPage course={altCourse} />);
     const pageHtml = renderToStaticMarkup(<CoursePage course={altCourse} />);
@@ -90,6 +90,25 @@ describe('JSON-driven presentation rendering', () => {
     expect(html).toContain('63mg');
     expect(html).toContain('disabled');
     expect(html).not.toContain('detail-panel');
+  });
+
+  it('renders only presenter-counted quiz votes and percentages', () => {
+    const quiz = coffeeCourse.slides.find((slide) => slide.id === 'quiz');
+    if (!quiz || quiz.type !== 'quiz') throw new Error('quiz missing');
+
+    const counted = renderToStaticMarkup(
+      <QuizView slide={quiz} ui={coffeeCourse.ui} pageNumber="05" votes={{ basic: 2, pro: 1 }} onVote={noop} />
+    );
+    const empty = renderToStaticMarkup(
+      <QuizView slide={quiz} ui={coffeeCourse.ui} pageNumber="05" votes={{}} onVote={noop} />
+    );
+
+    expect(counted).toContain(`2 ${coffeeCourse.ui.peopleUnit}`);
+    expect(counted).toContain('67%');
+    expect(counted).toContain(coffeeCourse.ui.selected);
+    expect(counted).toContain(`aria-label="−1 速溶 / 不常喝"`);
+    expect(empty).toContain('0%');
+    expect(empty).not.toContain('60%');
   });
 
   it('prints configured cover topics and CTA action', () => {

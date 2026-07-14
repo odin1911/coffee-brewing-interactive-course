@@ -13,6 +13,9 @@ describe('active course data', () => {
     expect(course.slides.find((slide) => slide.id === 'beans')).toMatchObject({
       type: 'content', title: '咖啡豆三大产区与风味'
     });
+    const quiz = course.slides.find((slide) => slide.id === 'quiz');
+    if (!quiz || quiz.type !== 'quiz') throw new Error('quiz missing');
+    expect(quiz.options.every((option) => !Object.hasOwn(option, 'initialVotes'))).toBe(true);
   });
 
   it('keeps each answer path at eight teaching pages', () => {

@@ -21,7 +21,7 @@
 - `cover`：必填 `title`；可选 `subtitle`、`topics`、`image`、`imageAlt`。
 - `content`：必填 `title`、`bullets`；可选 `image`、`imageAlt`。
 - `chart`：必填 `title` 和 `chart.kind/unit/clickable/series[]`；每项数据包含 `label`、非负有限数值 `value`、指向 `details` 的 `detail`。
-- `quiz`：必填 `question`、`options[]`；可选 `description`；每个选项包含 `id`、`text`、`goto` 和可选的非负整数 `initialVotes`。
+- `quiz`：必填 `question`、`options[]`；可选 `description`；每个选项包含 `id`、`text` 和 `goto`。
 - `cta`：必填 `title`、`body`、`action.label`、`action.href`。
 - `details`：每项包含 `title` 和 `facts[]`。
 
@@ -56,6 +56,8 @@ npm run validate:course
 3. `src/main.tsx` 根据 `slides[].type` 选择 `cover`、`content`、`chart`、`quiz` 或 `cta` 通用渲染器。
 4. `src/session.ts` 根据数组顺序、`next` 和 `goto` 计算下一页，不包含固定课程路径。
 5. `/print` 遍历同一份 `slides[]`，同时展开所有答题分支和图表明细。
+
+答题页由主讲人根据台下回答重复加票，并可减票纠错；票数和百分比从 0 开始即时计算。只有一个选项票数最高时才允许继续，并按该选项的 `goto` 进入后续分支；零票或平票时继续按钮不可用。
 
 现场换课时，用另一门课程配置覆盖 `public/course.json` 并刷新页面，即可同时替换标题、文字、品牌、页面数量、图表和分支。仓库使用 `fixtures/course-alt.json` 验证非咖啡课程可以通过相同代码完成加载、渲染和打印。
 
