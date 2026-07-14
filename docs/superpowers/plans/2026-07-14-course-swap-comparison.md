@@ -1,5 +1,7 @@
 # Family Safety Course Swap Implementation Plan
 
+Status: completed for comparison; the active course was subsequently restored to the preserved coffee JSON.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the active coffee course with the family safety course, preserve the exact coffee JSON, and produce a verified before/after comparison without changing runtime code.

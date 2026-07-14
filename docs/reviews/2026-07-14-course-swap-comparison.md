@@ -2,9 +2,11 @@
 
 日期：2026-07-14
 
+> 状态：对比验证完成后，`public/course.json` 已恢复为咖啡课程；家庭防灾配置继续保存在 `fixtures/course-alt.json`。
+
 ## 结果
 
-活动课程已从“咖啡冲煮入门”切换为“家庭防灾入门”。替换前 JSON 完整保存在 `fixtures/course-coffee.json`，与 Git 中替换前的 `public/course.json` 字节一致。`src/` 无任何改动。
+验证期间活动课程曾从“咖啡冲煮入门”切换为“家庭防灾入门”。替换前 JSON 完整保存在 `fixtures/course-coffee.json`，与 Git 中替换前的 `public/course.json` 字节一致。`src/` 无任何改动。
 
 | 对比项 | 替换前 | 替换后 |
 |---|---|---|
