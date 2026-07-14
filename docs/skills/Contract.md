@@ -12,21 +12,32 @@
 - `task_plan.md`、`findings.md`、`progress.md`：使用文件规划流程期间，及时记录阶段状态、关键发现与验证证据。
 
 完成任何开发批次前，必须检查实现与上述文档是否一致；不一致即视为该批次未完成。
-# Contract
 
-- Runtime course content is loaded from `public/course.json`; replacing only this JSON must allow a completely different course without code changes.
-- All visible course and print text, interaction labels, image addresses, brand colors, slide order, chart data, and CTA behavior come from the active JSON. Generic `/tools` engine copy is outside this boundary.
-- Course slides contain teaching only. Export, recording status, restart, and validation live under `/tools`.
-- `/print` renders all configured branches and chart details; `/tools` never appears in the PDF.
-- Local recording writes one server-generated JSON file per course run; static deployment disables recording.
-- No runtime AI request, remote font, remote non-image content, state library, or chart library. Configured public HTTPS images are the only remote-content exception.
-- Images accept local paths, HTTPS URLs, or base64 raster data URLs. HTTP, executable protocols, backslash paths, and non-image data URLs are rejected.
-- Printing waits for every configured image to load and decode. A failed image blocks printing with its address; a successfully exported PDF contains its image data and opens offline.
-- Light surfaces set explicit dark foreground colors. Normal text contrast is at least 4.5:1.
-- The preserved `fixtures/course-coffee.json` reference course follows Appendix A: 9 definitions provide two 8-page branches in the order cover, regions, caffeine, steps, quiz, branch, extraction, CTA. The active `public/course.json` may be any valid replacement course.
-- Chart data is native button/CSS UI. Series are non-empty with finite non-negative values; every drill-down id must be an own top-level `details` entry. Quiz initial votes are non-negative integers.
-- The `/course` route contains teaching only; `/tools` and `/print` are separate routes.
-- `public/sources.json` records the origin of every course fact and image, including remote image URLs.
-- Missing local assets are reported on `/tools` with a repairable path; they do not silently render broken images.
-- `npm start` is the official one-command local delivery path: it builds the production frontend and starts `server.mjs` on port 4173 by default. `npm run local` is an alias; `npm run preview` only serves an existing Vite build.
-- `npm run export:pdf` builds, starts a temporary local server, writes the course-neutral `exports/course.pdf`, and stops the server without browser interaction. The PDF is a tracked delivery artifact.
+## 内容与配置
+
+- 运行时课程内容从 `public/course.json` 加载；只替换该文件即可换成完全不同的课程，不得要求修改代码。
+- 当前 JSON 提供课程页和打印页的全部文字、交互标签、图片地址、品牌配色、页面顺序、图表数据及结束页操作（`cta`）。通用 `/tools` 引擎文案不属于课程内容边界。
+- 运行时不得请求人工智能服务、远程字体或远程非图片内容，也不得引入状态管理库或图表库。配置中的公开 HTTPS 图片是唯一的远程内容例外。
+- `fixtures/course-coffee.json` 保存符合附录 A 的参考课程：9 个页面定义组成两条各 8 页的路径，顺序为封面、产区、咖啡因、步骤、答题、分支、萃取和结束页。活动配置 `public/course.json` 可以替换为任意有效课程。
+- `public/sources.json` 记录每项课程事实和图片的来源，包括远程图片地址。
+
+## 页面与交互
+
+- 课程页面只包含教学内容；导出、记录状态、重新开始和配置校验位于 `/tools`。
+- `/course` 只承载教学流程；`/tools` 和 `/print` 使用独立路由。
+- `/print` 渲染配置中的全部分支和图表明细，导出的 PDF 不得包含 `/tools`。
+- 图表使用原生按钮和 CSS 实现。数据序列不得为空，数值必须是有限的非负数，每个钻取标识必须对应 `details` 的自有顶层字段。
+- 选择题的预置票数必须是非负整数。
+
+## 素材与视觉
+
+- 图片支持本地路径、HTTPS 地址和 `data:image/...` 形式的 base64 栅格图片。系统拒绝 HTTP、可执行协议、反斜杠路径和非图片 data URL。
+- `/tools` 必须显示缺失的本地素材及可修复路径，不得静默渲染损坏图片。
+- 打印前必须等待所有配置图片完成加载和解码。任一图片失败时阻止打印并显示地址；成功导出的 PDF 必须嵌入图片数据并支持离线打开。
+- 浅色表面必须显式设置深色前景色，普通文字对比度不得低于 `4.5:1`。
+
+## 运行与交付
+
+- 本地记录模式由服务端为每次课程运行创建一个 JSON 文件；纯静态部署自动关闭记录功能。
+- `npm start` 是正式的一键本地交付命令：先构建生产前端，再启动 `server.mjs`，默认端口为 `4173`。`npm run local` 是兼容别名；`npm run preview` 只预览已有的 Vite 构建。
+- `npm run export:pdf` 构建项目、启动临时服务、生成通用文件名 `exports/course.pdf`，并在无需浏览器交互的情况下关闭临时服务。该 PDF 是纳入版本库跟踪的正式交付物。
