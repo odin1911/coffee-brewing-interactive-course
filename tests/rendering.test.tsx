@@ -1,15 +1,37 @@
+import { readFileSync } from 'node:fs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import altJson from '../fixtures/course-alt.json';
 import courseJson from '../public/course.json';
-import { validateCourse } from '../src/course';
-import { ChartView, CoursePage, PrintPage, SlideView, waitForImages } from '../src/main';
+import { courseTheme, validateCourse } from '../src/course';
+import { applyCourseTitle, ChartView, completeCourse, CoursePage, PrintPage, SlideView, ToolsPage, waitForImages } from '../src/main';
 
 const altCourse = validateCourse(altJson);
 const coffeeCourse = validateCourse(courseJson);
 const noop = () => undefined;
 
 describe('JSON-driven presentation rendering', () => {
+  it('records the final slide and completed status before following the CTA', async () => {
+    const events: string[] = [];
+    const recorder = {
+      slideCompleted: async (slideId: string) => { events.push(`slide:${slideId}`); },
+      finish: async (status: 'completed' | 'abandoned') => { events.push(`status:${status}`); }
+    };
+
+    await completeCourse(recorder, 'summary', '/course', (href) => { events.push(`navigate:${href}`); });
+
+    expect(events).toEqual(['slide:summary', 'status:completed', 'navigate:/course']);
+  });
+
+  it('replaces the generic shell title with the JSON course title', () => {
+    const shell = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const target = { title: '交互式课件' };
+
+    expect(shell).not.toContain('咖啡冲煮入门');
+    applyCourseTitle(altCourse.course.title, target);
+    expect(target.title).toBe(altCourse.course.title);
+  });
+
   it('renders the alternate course without coffee-course copy or colors', () => {
     const cover = altCourse.slides[0];
     const courseHtml = renderToStaticMarkup(
@@ -29,6 +51,18 @@ describe('JSON-driven presentation rendering', () => {
     expect(pageHtml).not.toContain('/ 08');
   });
 
+  it('renders every Appendix B tools label from JSON with the course theme', () => {
+    const courseHtml = renderToStaticMarkup(<CoursePage course={altCourse} />);
+    const toolsHtml = renderToStaticMarkup(<ToolsPage course={altCourse} />);
+
+    expect(courseHtml).toContain(altCourse.ui.openTools);
+    for (const key of ['openTools', 'recordStatus', 'restartCourse', 'validationResult', 'exportPdf', 'backToCourse'] as const) {
+      expect(toolsHtml).toContain(altCourse.ui[key]);
+    }
+    expect(toolsHtml).toContain(altCourse.course.brand.primary);
+    expect(toolsHtml).not.toMatch(/课外工具|课件工具页|咖啡|冲煮/);
+  });
+
   it('uses JSON-backed theme variables for course and print surfaces', () => {
     const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8');
     const source = readFileSync(new URL('../src/main.tsx', import.meta.url), 'utf8');
@@ -36,6 +70,8 @@ describe('JSON-driven presentation rendering', () => {
     expect(css).toMatch(/\.stage\{[^}]*background:var\(--canvas\)/);
     expect(css).toMatch(/\.bar\{[^}]*background:var\(--bar-color/);
     expect(css).toMatch(/\.print-slide\{[^}]*background:var\(--canvas\)/);
+    expect(css).toMatch(/:where\(a,button\):focus-visible\{[^}]*outline:3px solid var\(--focus\)/);
+    expect(courseTheme(altCourse.course.brand)['--focus']).toBe(altCourse.course.brand.accent);
     expect(source).not.toContain('冲煮手记');
   });
 
@@ -85,4 +121,3 @@ describe('JSON-driven presentation rendering', () => {
     await expect(waitForImages([failed])).rejects.toThrow('https://img.example/missing.jpg');
   });
 });
-import { readFileSync } from 'node:fs';

@@ -6,6 +6,21 @@ import { SessionRecorder } from './recorder';
 import './styles.css';
 import './print.css';
 
+export async function completeCourse(
+  recorder: Pick<SessionRecorder, 'slideCompleted' | 'finish'> | null,
+  slideId: string,
+  href: string,
+  navigate: (href: string) => void
+) {
+  await recorder?.slideCompleted(slideId);
+  await recorder?.finish('completed');
+  navigate(href);
+}
+
+export function applyCourseTitle(title: string, target: { title: string }) {
+  target.title = title;
+}
+
 export function CoursePage({ course }: { course: CourseConfig }) {
   const reducer = useMemo(() => createCourseReducer(course), [course]);
   const [state, dispatch] = useReducer(reducer, course, createInitialState);
@@ -40,7 +55,7 @@ export function CoursePage({ course }: { course: CourseConfig }) {
           <img src={assetUrl(course.course.brand.logo)} referrerPolicy={imageReferrerPolicy(course.course.brand.logo)} alt="" />
           <span>{course.course.presenter}</span>
         </a>
-        <span className="course-label">{course.course.title}</span>
+        <div className="course-header-actions"><span className="course-label">{course.course.title}</span><a className="tools-link" href="/tools">{course.ui.openTools}</a></div>
       </header>
       <section className="stage" aria-labelledby="slide-title">
         <div className="rail" aria-label={pageNumber}><strong>{pageNumber}</strong></div>
@@ -49,7 +64,7 @@ export function CoursePage({ course }: { course: CourseConfig }) {
           <nav className="slide-nav" aria-label={course.ui.navigation}>
             <button type="button" onClick={goPrevious} disabled={state.visitedPath.length <= 1}>{course.ui.previous}</button>
             <span>{pageNumber}</span>
-            {slide.type === 'cta' ? <a className="primary" href={slide.action.href} onClick={() => { void recorder.current?.slideCompleted(slide.id); void recorder.current?.finish('completed'); }}>{slide.action.label}</a> : <button type="button" className="primary" onClick={goNext} disabled={!nextId}>{slide.type === 'quiz' ? course.ui.continue : course.ui.next}</button>}
+            {slide.type === 'cta' ? <a className="primary" href={slide.action.href} onClick={(event) => { event.preventDefault(); void completeCourse(recorder.current, slide.id, slide.action.href, (href) => window.location.assign(href)); }}>{slide.action.label}</a> : <button type="button" className="primary" onClick={goNext} disabled={!nextId}>{slide.type === 'quiz' ? course.ui.continue : course.ui.next}</button>}
           </nav>
         </div>
       </section>
@@ -103,6 +118,7 @@ function App() {
   const [course, setCourse] = useState<CourseConfig | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => { loadCourse().then(setCourse).catch((reason: unknown) => setError(reason instanceof CourseConfigError ? reason.errors.join('；') : String(reason))); }, []);
+  useEffect(() => { if (course) applyCourseTitle(course.course.title, document); }, [course]);
   if (error) return <main className="status-card"><h1>课程配置无法加载</h1><p>{error}</p></main>;
   if (!course) return <main className="status-card"><p>正在加载课程……</p></main>;
   if (window.location.pathname === '/tools') return <ToolsPage course={course} />;
@@ -110,10 +126,10 @@ function App() {
   return <CoursePage course={course} />;
 }
 
-function ToolsPage({ course }: { course: CourseConfig }) {
+export function ToolsPage({ course }: { course: CourseConfig }) {
   const [missingAssets, setMissingAssets] = useState<string[]>([]);
   useEffect(() => { void findMissingAssets(course).then(setMissingAssets); }, [course]);
-  return <main className="utility-shell"><a className="utility-back" href="/course">← 回到课程</a><div className="utility-card"><p className="eyebrow">课外工具</p><h1>课件工具页</h1><p>这里放记录、校验和完整打印，不打断教学路径。</p><div className="utility-actions"><a href="/print">打开完整打印版</a><a href="/course">重新开始课程</a></div><dl><div><dt>课程</dt><dd>{course.course.title}</dd></div><div><dt>配置</dt><dd>已加载 {course.slides.length} 个页面定义</dd></div><div><dt>素材</dt><dd>{missingAssets.length ? <span className="asset-error">缺少：{missingAssets.join('、')}</span> : '本地素材检查通过'}</dd></div><div><dt>记录</dt><dd>本地运行时由服务端增量保存；纯静态部署自动关闭</dd></div></dl></div></main>;
+  return <main className="utility-shell" style={courseTheme(course.course.brand) as CSSProperties}><a className="utility-back" href="/course">← {course.ui.backToCourse}</a><div className="utility-card"><p className="eyebrow">{course.course.title}</p><h1>{course.ui.openTools}</h1><div className="utility-actions"><a href="/print">{course.ui.exportPdf}</a><a href="/course">{course.ui.restartCourse}</a></div><dl><div><dt>{course.ui.validationResult}</dt><dd>已加载 {course.slides.length} 个页面定义</dd></div><div><dt>素材</dt><dd>{missingAssets.length ? <span className="asset-error">缺少：{missingAssets.join('、')}</span> : '本地素材检查通过'}</dd></div><div><dt>{course.ui.recordStatus}</dt><dd>本地运行时由服务端增量保存；纯静态部署自动关闭</dd></div></dl></div></main>;
 }
 
 export function PrintPage({ course }: { course: CourseConfig }) {

@@ -42,10 +42,30 @@
 
 ## GREEN evidence
 
-- `npm test`：7 个测试文件、29 项测试全部通过。
+- `npm test`：7 个测试文件、33 项测试全部通过。
 - `npm run build`：TypeScript 检查通过，Vite 生产构建成功。
 - `git diff --check`：退出码 0，无空白错误。
 - 定向 RED/GREEN 已分别观察：附录 A 页序、JSON 渲染、主题变量、图片等待和地址安全边界均先失败后通过。
+
+## 独立代码 Review 与复验
+
+实现完成后由独立 subagent 进行代码审查。审查结论为：无 Critical，发现 2 项 Important、2 项 Minor；本批次已全部修复。
+
+| ID | Review 发现（修复前） | 修复后效果 | 回归证明 |
+|---|---|---|---|
+| C1 | CTA 点击后并发发送末页记录和完成状态，同时浏览器立即跳转，可能丢失或被卸载清理覆盖为 `abandoned` | 阻止默认跳转，严格等待“末页记录 → `completed` → 跳转” | `records the final slide and completed status before following the CTA` |
+| C2 | `index.html` 标题硬编码为“咖啡冲煮入门”，换课后浏览器标签仍残留旧课程 | HTML 使用通用占位标题；JSON 加载后将 `document.title` 更新为 `course.title` | `replaces the generic shell title with the JSON course title` |
+| C3 | 校验接受大小写不敏感的 HTTPS，但图片防盗链策略和本地素材检查只识别小写 `https://` | 地址识别统一复用 HTTPS 解析逻辑，大写协议同样不发送 referrer，也不会被当成本地文件检查 | `handles uppercase HTTPS images consistently after validation` |
+| C4 | `DESIGN.md` 声明存在 `--focus` 与键盘焦点环，但 CSS 未实现 | `--focus` 随 JSON 的 `brand.accent` 注入，所有链接和按钮显示 3px `:focus-visible` 外环 | JSON 主题与 CSS 焦点样式断言 |
+| C5 | 复验发现附录 B 原有的 4 个工具页 `ui` 文案仍未消费，工具页也未应用 JSON 主题 | 课程页显示 JSON 工具入口；工具页使用 `openTools`、`recordStatus`、`restartCourse`、`validationResult` 并继承课程品牌主题 | `renders every Appendix B tools label from JSON with the course theme` |
+
+上述五项均观察到定向测试先失败、修复后通过；最终再次执行全套测试、生产构建和空白检查。
+
+## 字段“展示”的判定边界
+
+- 标题、正文、选项、图表数据/单位、详情、CTA、主讲人、图片、品牌样式和 `ui` 文案需要在课程、工具或打印页面中可见。
+- `id`、`version`、`next`、`goto`、`clickable` 等控制字段不要求原样显示文字，但必须分别参与会话标识、校验、导航分支或交互行为。
+- `imageAlt` 属于无障碍替代文本；在图片不可见时由辅助技术读取，不作为重复正文展示。
 
 ## 尚未自动证明的项目
 

@@ -50,10 +50,11 @@ const imageAddress = (value: unknown): value is string => text(value) && (localA
 const actionAddress = (value: unknown): value is string => text(value) && (localAddress(value) || httpsAddress(value) || (cleanAddress(value) && /^(?:mailto:|tel:)/i.test(value)));
 
 export const assetUrl = (path: string) => /^(?:https:\/\/|data:image\/|\/)/i.test(path) ? path : `/${path}`;
-export const imageReferrerPolicy = (path: string) => path.startsWith('https://') ? 'no-referrer' as const : undefined;
+export const imageReferrerPolicy = (path: string) => httpsAddress(path) ? 'no-referrer' as const : undefined;
 export const courseTheme = (brand: Brand): ThemeStyle => ({
   '--primary': brand.primary,
   '--accent': brand.accent,
+  '--focus': brand.accent,
   '--canvas': brand.background,
   '--ink': brand.text,
   '--surface': brand.surface ?? brand.background,
@@ -130,7 +131,7 @@ export async function findMissingAssets(course: CourseConfig, fetcher: typeof fe
   for (const slide of course.slides) if ((slide.type === 'cover' || slide.type === 'content') && slide.image) paths.add(slide.image);
   const missing: string[] = [];
   for (const path of paths) {
-    if (path.startsWith('https://') || path.startsWith('data:image/')) continue;
+    if (httpsAddress(path) || dataImage(path)) continue;
     const url = assetUrl(path);
     try { if (!(await fetcher(url, { method: 'HEAD' })).ok) missing.push(url); } catch { missing.push(url); }
   }

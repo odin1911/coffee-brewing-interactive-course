@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { assetUrl, courseTheme, CourseConfigError, imageReferrerPolicy, validateCourse } from '../src/course';
+import { assetUrl, courseTheme, CourseConfigError, findMissingAssets, imageReferrerPolicy, validateCourse } from '../src/course';
 
 const valid: any = {
   course: {
@@ -28,6 +28,22 @@ describe('validateCourse', () => {
     expect(assetUrl('data:image/png;base64,AA==')).toBe('data:image/png;base64,AA==');
     expect(imageReferrerPolicy('https://img.example/a.jpg')).toBe('no-referrer');
     expect(courseTheme(valid.course.brand)).toMatchObject({ '--primary': '#4A2C1A', '--accent': '#D89A4E' });
+  });
+
+  it('handles uppercase HTTPS images consistently after validation', async () => {
+    const input = structuredClone(valid);
+    input.course.brand.logo = 'HTTPS://img.example/a.jpg';
+    const course = validateCourse(input);
+    let requested = false;
+
+    const missing = await findMissingAssets(course, async () => {
+      requested = true;
+      return new Response(null, { status: 404 });
+    });
+
+    expect(imageReferrerPolicy(course.course.brand.logo)).toBe('no-referrer');
+    expect(missing).toEqual([]);
+    expect(requested).toBe(false);
   });
 
   it('rejects unsafe image addresses', () => {
