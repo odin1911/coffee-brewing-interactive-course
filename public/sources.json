@@ -18,9 +18,9 @@
       "purpose": "课程行动总结"
     },
     {
-      "path": "public/assets/logo.svg",
-      "source": "AI-generated local SVG mark",
-      "purpose": "课程品牌标记"
+      "path": "course.brand.logo",
+      "source": "Twemoji v14.0.2 shield emoji via pinned jsDelivr URL",
+      "purpose": "家庭防灾课程品牌标记"
     }
   ]
 }

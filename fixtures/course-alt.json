@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "title": "家庭防灾入门",
     "presenter": "应急手记",
-    "brand": { "primary": "#17324D", "accent": "#D78B3C", "background": "#EEF4F7", "text": "#17212B", "surface": "#FFFFFF", "muted": "#40566B", "line": "#AFC4D3", "chartColors": ["#17324D", "#D78B3C", "#3E7B6A"], "logo": "assets/logo.svg" }
+    "brand": { "primary": "#17324D", "accent": "#D78B3C", "background": "#EEF4F7", "text": "#17212B", "surface": "#FFFFFF", "muted": "#40566B", "line": "#AFC4D3", "chartColors": ["#17324D", "#D78B3C", "#3E7B6A"], "logo": "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f6e1.svg" }
   },
   "ui": {
     "navigation": "安全课程导航", "previous": "返回", "next": "下一项", "continue": "进入建议", "showDetail": "查看准备明细", "closeDetail": "收起明细", "exportPdf": "导出防灾手册", "openTools": "打开检查工具", "recordStatus": "演练记录", "restartCourse": "重新演练", "validationResult": "清单校验", "backToCourse": "返回防灾课程", "select": "选择此项", "selected": "已选择", "results": "当前选择", "peopleUnit": "次", "imageLoadError": "防灾图片加载失败"

@@ -7,6 +7,7 @@ describe('course replacement proof', () => {
   it('uses the family safety course as the active runtime JSON', () => {
     const course = validateCourse(activeJson);
     expect(course.course.id).toBe('weather-safety-101');
+    expect(course.course.brand.logo).toBe('https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f6e1.svg');
     expect(course.slides[0]).not.toHaveProperty('image');
   });
 
