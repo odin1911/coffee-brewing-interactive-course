@@ -12,7 +12,8 @@
 - 输出固定为与课程内容无关的 `exports/course.pdf`
 - 复用现有 `/print` 页面、`server.mjs` 和本机 Google Chrome
 - 导出失败时返回非零退出码并说明失败阶段
-- 不留下服务进程或被 Git 跟踪的导出文件
+- 不留下服务进程或无效导出文件
+- `exports/course.pdf` 作为正式交付物纳入 Git 跟踪
 
 ## 3. 非目标
 
@@ -41,7 +42,7 @@
 - `scripts/export-pdf.mjs`：编排构建、临时服务、Chrome 打印、文件校验和清理
 - `tests/export-pdf.test.mjs`：覆盖 Chrome 参数和 PDF 文件头校验
 - `package.json`：增加 `export:pdf` 命令
-- `.gitignore`：忽略 `exports/`
+- `exports/course.pdf`：由脚本生成并纳入 Git 跟踪的正式交付物
 - `README.md`：记录一条命令导出方式、输出位置和 Chrome 前置条件
 - `docs/skills/Contract.md`：增加本地一键导出的验收约束
 

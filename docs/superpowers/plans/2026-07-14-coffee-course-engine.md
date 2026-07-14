@@ -63,7 +63,7 @@ At each task boundary, stop visual polishing when its budget expires and preserv
 ├── examples/
 │   └── learning-record.json               # Reviewed record example
 ├── exports/
-│   └── coffee-course.pdf                  # Inspected nine-page submission PDF
+│   └── course.pdf                         # Inspected nine-page submission PDF
 ├── docs/
 │   ├── design/
 │   │   ├── reference-cover.html
@@ -1602,7 +1602,7 @@ git commit -m "test: prove no-code course replacement"
 **Files:**
 - Create: `README.md`
 - Create: `examples/learning-record.json`
-- Create: `exports/coffee-course.pdf`
+- Create: `exports/course.pdf`
 - Modify: `public/sources.json`
 - Modify: `docs/skills/Contract.md`
 
@@ -1620,7 +1620,7 @@ Create `README.md` with these exact sections and facts:
 ## Requirements
 
 - Node.js 24 or newer
-- Chromium-based browser for PDF export
+- macOS Google Chrome for PDF export
 
 ## Run locally
 
@@ -1655,7 +1655,7 @@ Document `course`, `ui`, the five `slides[].type` shapes, `next`, quiz `goto`, c
 
 ## Export PDF
 
-Open `/tools`, select “导出完整 PDF”, and save the browser print dialog as PDF. The PDF contains both branches and all chart details; it excludes `/tools`.
+Run `npm run export:pdf`. The command builds the project, starts and stops a temporary server, and writes the tracked delivery file to `exports/course.pdf`. The PDF contains both branches and all chart details; it excludes `/tools`.
 
 ## Learning records
 
@@ -1677,7 +1677,7 @@ Copy one completed runtime file into `examples/learning-record.json`. It must co
 
 - [ ] **Step 3: Produce and inspect the PDF**
 
-Run `npm run dev`, open `/tools`, export the complete PDF, and save it as `exports/coffee-course.pdf`.
+Run `npm run export:pdf`. Confirm that it exits with status 0 and writes `exports/course.pdf` without browser interaction.
 
 Use the `pdf` skill to render and inspect every page. Expected:
 
@@ -1714,7 +1714,7 @@ Append to `docs/skills/Contract.md`:
 ```
 
 ```bash
-git add README.md public/sources.json examples/learning-record.json exports/coffee-course.pdf docs/skills/Contract.md
+git add README.md public/sources.json examples/learning-record.json exports/course.pdf docs/skills/Contract.md
 git commit -m "docs: complete course engine delivery"
 ```
 
